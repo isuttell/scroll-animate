@@ -22,27 +22,13 @@
      *
      * @type    {Object}
      */
-    var options = ScrollAnimate.options = {
+    var options = {
         loop: false,
         smoothScroll: {
             enabled: false,
             speed: 15
         }
     };
-
-    /**
-     * Array of elements to animate
-     *
-     * @type    {Array}
-     */
-    var items = [];
-
-    /**
-     * Scroller starts paused until either 'run' or 'play' is called
-     *
-     * @type    {Boolean}
-     */
-    var paused = true;
 
     /**
      * Default Options for each item
@@ -63,9 +49,28 @@
     };
 
     /**
+     * Update options or return current settings
+     *
+     * @param     {Object}    settings    optional
+     *
+     * @return    {Object}
+     */
+    ScrollAnimate.options = function(settings) {
+        if(typeof settings === 'object') {
+            options = _.defaults(settings, options);
+            return this;
+        } else {
+            return options;
+        }
+    };
+
+    /**
      * Setups events
      */
-    ScrollAnimate.run = function() {
+    ScrollAnimate.run = function(settings) {
+        if(typeof settings === 'object') {
+            options = _.defaults(settings, options);
+        }
         paused = false;
         if(options.loop) {
             animate(); // Start the wheel
@@ -79,6 +84,20 @@
             window.addEventListener("DOMMouseScroll", mouseScroll, false);
         }
     };
+
+    /**
+     * Array of elements to animate
+     *
+     * @type    {Array}
+     */
+    var items = [];
+
+    /**
+     * Scroller starts paused until either 'run' or 'play' is called
+     *
+     * @type    {Boolean}
+     */
+    var paused = true;
 
     /**
      * Causes the loop to pause and not update any values
@@ -173,6 +192,13 @@
             scrollEvent();
         }
     }
+
+    /**
+     * Clears the list of items to animate
+     */
+    ScrollAnimate.reset = function() {
+        items = [];
+    };
 
     /**
      * Stop all animation, loop and event listeners
