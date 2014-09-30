@@ -17,6 +17,40 @@
 })(this, function(root, ScrollAnimate, _, $) {
     "use strict";
 
+    /*--------------------------------------------------------------------------
+    | window.requestAnimationFrame polyfill
+    */
+
+    var vendors = ['ms', 'moz', 'webkit', 'o'];
+    for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+        window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
+        window.cancelAnimationFrame = window[vendors[x]+'CancelAnimationFrame']
+                                   || window[vendors[x]+'CancelRequestAnimationFrame'];
+    }
+
+    if (!window.requestAnimationFrame){
+        var lastFrameTime = 0;
+        window.requestAnimationFrame = function(callback, element) {
+            var currTime = new Date().getTime();
+            var timeToCall = Math.max(0, 16 - (currTime - lastFrameTime));
+            var id = window.setTimeout(function() { callback(currTime + timeToCall); },
+              timeToCall);
+            lastFrameTime = currTime + timeToCall;
+            return id;
+        };
+    }
+
+    if (!window.cancelAnimationFrame) {
+        window.cancelAnimationFrame = function(id) {
+            clearTimeout(id);
+        };
+    }
+
+    /*--------------------------------------------------------------------------
+    | Smooth Scroll
+    */
+
+
     /**
      * Default Options
      *
@@ -139,11 +173,7 @@
      * Called when we scroll
      */
     var scrollEvent = function() {
-        if(window.requestAnimationFrame) {
-            window.requestAnimationFrame(animate);
-        } else {
-            animate(); // Start the wheel
-        }
+        window.requestAnimationFrame(animate);
     };
 
     /**
@@ -347,12 +377,7 @@
         }
 
         if(options.loop) {
-            // Loop
-            if(window.requestAnimationFrame) {
-                window.requestAnimationFrame(animate);
-            } else {
-                setTimeout(animate, 0);
-            }
+            window.requestAnimationFrame(animate);
         }
     };
 
