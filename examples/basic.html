@@ -50,7 +50,13 @@
                 property: 'transform',
                 transform: 'translateX(%s%)'
 		})
-		.run();
+		.run({
+			loop: true,
+			smoothScroll: {
+				enabled: false,
+				speed: 15
+			}
+		});
 
 
 		$('#toggle').click(function(){

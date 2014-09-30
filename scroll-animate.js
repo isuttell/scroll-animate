@@ -24,13 +24,12 @@
     var vendors = ['ms', 'moz', 'webkit', 'o'];
     for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
         window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
-        window.cancelAnimationFrame = window[vendors[x]+'CancelAnimationFrame']
-                                   || window[vendors[x]+'CancelRequestAnimationFrame'];
+        window.cancelAnimationFrame = window[vendors[x]+'CancelAnimationFrame'] || window[vendors[x]+'CancelRequestAnimationFrame'];
     }
 
     if (!window.requestAnimationFrame){
         var lastFrameTime = 0;
-        window.requestAnimationFrame = function(callback, element) {
+        window.requestAnimationFrame = function(callback) {
             var currTime = new Date().getTime();
             var timeToCall = Math.max(0, 16 - (currTime - lastFrameTime));
             var id = window.setTimeout(function() { callback(currTime + timeToCall); },
@@ -57,7 +56,7 @@
      * @type    {Object}
      */
     var options = {
-        loop: false,
+        loop: true,
         smoothScroll: {
             enabled: false,
             speed: 15
@@ -102,21 +101,48 @@
      * Setups events
      */
     ScrollAnimate.run = function(settings) {
-        if(typeof settings === 'object') {
-            options = _.defaults(settings, options);
-        }
+        this.options(settings || {});
+
         paused = false;
+
         if(options.loop) {
             animate(); // Start the wheel
-        } else if(!options.smoothScroll.enabled) {
+        }
+
+        this.addEventListeners();
+
+        return this;
+    };
+
+    /**
+     * Add event listeners
+     */
+    ScrollAnimate.addEventListeners = function () {
+        if(!options.smoothScroll.enabled) {
             $(window).scroll(_.throttle(scrollEvent, 17)).scroll();
         }
 
         if(options.smoothScroll.enabled) {
             // deal with the mouse wheel
-            window.addEventListener("mousewheel", mouseScroll, false);
-            window.addEventListener("DOMMouseScroll", mouseScroll, false);
+            $(window).bind("mousewheel DOMMouseScroll", mouseScroll);
         }
+
+        return this;
+    };
+
+    /**
+     * Stop all event listeners
+     */
+    ScrollAnimate.removeEventListeners = function () {
+        if(!options.smoothScroll.enabled) {
+            $(window).unbind('scroll', scrollEvent);
+        }
+
+        if(options.smoothScroll.enabled) {
+            $(window).unbind('mousewheel DOMMouseScroll', mouseScroll);
+        }
+
+        return this;
     };
 
     /**
@@ -138,6 +164,8 @@
      */
     ScrollAnimate.pause = function() {
         paused = true;
+
+        return this;
     };
 
     /**
@@ -145,6 +173,8 @@
      */
     ScrollAnimate.play = function() {
         paused = false;
+
+        return this;
     };
 
     /**
@@ -152,6 +182,8 @@
      */
     ScrollAnimate.toggle = function() {
         paused = !paused;
+
+        return this;
     };
 
     /**
@@ -211,10 +243,10 @@
         }
 
         // deal with different browsers calculating the delta differently
-        if (event.wheelDelta) {
-            mouseDelta = event.wheelDelta / 120;
-        } else if (event.detail) {
-            mouseDelta = -event.detail / 3;
+        if (event.originalEvent.wheelDelta) {
+            mouseDelta = event.originalEvent.wheelDelta / 120;
+        } else if (event.originalEvent.detail) {
+            mouseDelta = -event.originalEvent.detail / 3;
         }
 
         /*jshint validthis:true */
@@ -228,20 +260,8 @@
      */
     ScrollAnimate.reset = function() {
         items = [];
-    };
 
-    /**
-     * Stop all animation, loop and event listeners
-     */
-    ScrollAnimate.destroy = function () {
-        if(!options.smoothScroll.enabled) {
-            $(window).unbind('scroll', scrollEvent);
-        }
-
-        if(options.smoothScroll.enabled) {
-            window.removeEventListener('mousewheel', mouseScroll, false);
-            window.removeEventListener('DOMMouseScroll', mouseScroll, false);
-        }
+        return this;
     };
 
 
@@ -272,19 +292,6 @@
     };
 
     /**
-     * Get the scroll position
-     *
-     * @return    {Number}
-     */
-    // function getScrollTop() {
-    //     if (document.documentElement.scrollTop === 0) {
-    //         return document.body.scrollTop;
-    //     } else {
-    //         return document.documentElement.scrollTop;
-    //     }
-    // }
-
-    /**
      * Don't rerender if don't have to
      *
      * @type    {Number}
@@ -308,6 +315,9 @@
 
         var scrollTop = $(window).scrollTop(),
             i;
+
+        // console.log(scrollTop, lastScrollTop, scrollTop !== lastScrollTop);
+
         // Only update styles when the scroll top has changed
         if(paused !== true && scrollTop !== lastScrollTop) {
             var transforms = [];
@@ -360,6 +370,7 @@
             }
         }
         lastScrollTop = scrollTop;
+
 
         /*--------------------------------------------------------------------------
         | Manually Scroll for smoother scrolling - Scroll Jack

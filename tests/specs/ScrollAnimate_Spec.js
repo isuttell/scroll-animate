@@ -10,7 +10,7 @@ describe("ScrollAnimate", function() {
 
         beforeEach(function(){
             expectedDefaults = {
-                loop: false,
+                loop: true,
                 smoothScroll: {
                     enabled: false,
                     speed: 15
@@ -28,9 +28,9 @@ describe("ScrollAnimate", function() {
         });
 
         it("should update options when passed an 'object' as an argument", function(){
-            var actual = ScrollAnimate.options({loop: true}),
+            var actual = ScrollAnimate.options({loop: false}),
                 expected = expectedDefaults;
-            expected.loop = true;
+            expected.loop = false;
             expect(ScrollAnimate.options()).toEqual(expected);
         });
 
@@ -106,9 +106,9 @@ describe("ScrollAnimate", function() {
         });
     });
 
-    describe("ScrollAnimate.destroy", function() {
+    describe("ScrollAnimate.removeEventListeners", function() {
         it("should be a function", function() {
-            expect(typeof ScrollAnimate.destroy).toBe('function');
+            expect(typeof ScrollAnimate.removeEventListeners).toBe('function');
         });
     });
 });
