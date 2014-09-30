@@ -2,6 +2,8 @@
 
 Animates elements by scroll position
 
+[![Build Status](https://travis-ci.org/isuttell/scroll-animate.svg)](https://travis-ci.org/isuttell/scroll-animate)
+
 ## Basic
 
 Currently requires LoDash and jQuery. Supports AMD.
