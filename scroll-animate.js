@@ -8,13 +8,13 @@
 (function(root, factory){
     "use strict";
     if(typeof define === 'function' && define.amd) {
-        define(['lodash', 'jquery', 'exports', function(_, $, exports){
-            root.ScrollAnimate = factory(root, exports, _, $);
+        define(['jquery', 'exports', function($, exports){
+            root.ScrollAnimate = factory(root, exports, $);
         }]);
     } else {
-        root.ScrollAnimate = factory(root, {}, root._, root.jQuery);
+        root.ScrollAnimate = factory(root, {}, root.jQuery);
     }
-})(this, function(root, ScrollAnimate, _, $) {
+})(this, function(root, ScrollAnimate, $) {
     "use strict";
 
     /*--------------------------------------------------------------------------
@@ -90,7 +90,7 @@
      */
     ScrollAnimate.options = function(settings) {
         if(typeof settings === 'object') {
-            options = _.defaults(settings, options);
+            options = extend(settings, options);
             return this;
         } else {
             return options;
@@ -101,6 +101,7 @@
      * Setups events
      */
     ScrollAnimate.run = function(settings) {
+
         this.options(settings || {});
 
         paused = false;
@@ -119,7 +120,8 @@
      */
     ScrollAnimate.addEventListeners = function () {
         if(!options.smoothScroll.enabled) {
-            $(window).scroll(_.throttle(scrollEvent, 17)).scroll();
+            scrollEvent();
+            $(window).scroll(scrollEvent);
         }
 
         if(options.smoothScroll.enabled) {
@@ -202,10 +204,20 @@
     };
 
     /**
-     * Called when we scroll
+     * Keep track of the last time scroll event was trigger
+     *
+     * @type    {Number}
+     */
+    var scrollThrottle = (new Date()).getTime();
+
+    /**
+     * Called when we scroll. Thottled 60fps
      */
     var scrollEvent = function() {
-        window.requestAnimationFrame(animate);
+        if((new Date()).getTime() - scrollThrottle > 16) {
+            scrollThrottle = (new Date()).getTime();
+            window.requestAnimationFrame(animate);
+        }
     };
 
     /**
@@ -264,6 +276,12 @@
         return this;
     };
 
+    /**
+     * Keep a running count for unique ids
+     *
+     * @type    {Number}
+     */
+    var idCount = 0;
 
     /**
      * Adds a property to animate
@@ -271,14 +289,14 @@
      * @param    {[type]}    options    [description]
      */
     ScrollAnimate.add = function(options) {
-        options = _.defaults(options, itemDefaults);
+        options = extend(options, itemDefaults);
         if(options.$el) {
             for(var i = 0; i < items.length; i++) {
                 if(options.$el.is(items[i].$el)) {
                     options.id = items[i].id;
                     break;
                 } else {
-                    options.id = _.uniqueId('el');
+                    options.id = 'el' + idCount++;
                 }
             }
             if(typeof options.tween === 'function') {
@@ -400,7 +418,7 @@
      *
      * @return    {Number}                 should be between 0 and 1
      */
-    var percentage = function(scrollTop, start, stop) {
+    function percentage(scrollTop, start, stop) {
 
         var value = scrollTop - start,
             adjustedMax = stop - start;
@@ -411,7 +429,26 @@
         } else {
             return  value / adjustedMax;
         }
-    };
+    }
+
+    /**
+     * Basic Recursive Extend Function
+     *
+     * @param     {Object}    src     input
+     * @param     {Object}    dest    defaults
+     *
+     * @return    {Object}
+     */
+    function extend(src, dest) {
+        for(var i in dest) {
+            if(typeof dest[i] === 'object') {
+                src[i] = extend(src[i], dest[i]);
+            } else if(typeof src[i] === 'undefined') {
+                src[i] = dest[i];
+            }
+        }
+        return src;
+    }
 
     return ScrollAnimate;
 });
