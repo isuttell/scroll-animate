@@ -1,0 +1,61 @@
+<html>
+<head>
+	<title>Basic Example</title>
+	<style>
+		body {
+			height: 100%;
+			min-height: 100%;
+		}
+
+		.container {
+			height: 200%;
+		}
+		.box {
+			width: 50px;
+			height: 50px;
+			background-color: red;
+			position: fixed;
+		}
+		#toggle {
+			position: fixed;
+			right: 10px;
+			top: 10px;
+		}
+	</style>
+</head>
+<body>
+	<button id="toggle" type="toggle">Toggle</button>
+	<div class="container">
+		<div class="box"></div>
+	</div>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.1/jquery.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
+	<script src="../scroll-animate.min.js"></script>
+	<script>
+		ScrollAnimate
+		.add({
+			$el : $('.box'),
+                scroll: {
+                    start: 0,
+                    stop: function() {
+                        return $(document).height() - $(window).height();
+                    }
+                },
+                values: {
+                    start: 0,
+                    stop: function() {
+                    	return $(document).width();
+                    }
+                },
+                property: 'transform',
+                transform: 'translateX(%s%)'
+		})
+		.run();
+
+		$('#toggle').click(function(){
+			ScrollAnimate.toggle();
+		});
+		console.log(ScrollAnimate);
+	</script>
+</body>
+</html>

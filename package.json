@@ -1,0 +1,26 @@
+{
+  "name": "scroll-animate",
+  "version": "0.1.0",
+  "description": "Animate elements by scroll position",
+  "homepage": "https://github.com/isuttell/scroll-animate",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/isuttell/scroll-animate.git"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "author": "Isaac Suttell <isaac@isaacsuttell.com>",
+  "readmeFilename": "README.md",
+  "devDependencies": {
+    "grunt": "~0.4.5",
+    "load-grunt-tasks": "~0.6.0",
+    "grunt-contrib-uglify": "~0.6.0",
+    "grunt-contrib-jasmine": "~0.8.0",
+    "grunt-cli": "~0.1.13",
+    "grunt-contrib-jshint": "~0.10.0",
+    "jit-grunt": "^0.8.0",
+    "grunt-bump": "0.0.15",
+    "time-grunt": "^1.0.0"
+  }
+}
