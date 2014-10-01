@@ -7,10 +7,10 @@
 
 (function(root, factory){
     "use strict";
-    if(typeof define === 'function' && define.amd) {
-        define(['jquery', 'exports', function($, exports){
+    if(typeof define === 'function' && typeof define.amd === 'object') {
+        define(['jquery', 'exports'], function($, exports){
             root.ScrollAnimate = factory(root, exports, $);
-        }]);
+        });
     } else {
         root.ScrollAnimate = factory(root, {}, root.jQuery);
     }
