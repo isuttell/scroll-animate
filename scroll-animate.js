@@ -101,19 +101,28 @@
      * Setups events
      */
     ScrollAnimate.run = function(settings) {
-
         this.options(settings || {});
 
-        paused = false;
-
-        if(options.loop) {
+        if(options.loop && paused === true) {
             animate(); // Start the wheel
         }
 
-        this.addEventListeners();
+        // If events are not connected then connect them
+        if(eventsInitialized === false) {
+            this.addEventListeners();
+        }
+
+        paused = false;
 
         return this;
     };
+
+    /**
+     * Interal check to see if events are connected;
+     *
+     * @type    {Boolean}
+     */
+    var eventsInitialized = false;
 
     /**
      * Add event listeners
@@ -129,6 +138,7 @@
             $(window).bind("mousewheel DOMMouseScroll", mouseScroll);
         }
 
+        eventsInitialized = true;
         return this;
     };
 
@@ -144,6 +154,7 @@
             $(window).unbind('mousewheel DOMMouseScroll', mouseScroll);
         }
 
+        eventsInitialized = false;
         return this;
     };
 
@@ -337,12 +348,11 @@
         /*--------------------------------------------------------------------------
         | Update item Properties
         */
-
         var scrollTop = $(window).scrollTop(),
             i;
 
         // Only update styles when the scroll top has changed
-        if(paused !== true && scrollTop !== lastScrollTop) {
+        if(paused === false && scrollTop !== lastScrollTop) {
             var transforms = [];
 
             for(i = 0; i < items.length; i++) {
