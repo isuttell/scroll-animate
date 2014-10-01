@@ -1,9 +1,5 @@
 module.exports = function (grunt)
 {
-
-    // Track the time of each task
-    require('time-grunt')(grunt);
-
     // Lazy Load
     require('jit-grunt')(grunt);
 
@@ -37,15 +33,62 @@ module.exports = function (grunt)
             },
             default: ['scroll-animate.js']
         },
-        jasmine:
-        {
+        jsvalidate: {
+            options:
+            {
+                globals: {},
+                esprimaOptions: {},
+                verbose: false
+            },
             build:
             {
-                src: 'scroll-animate.js',
+                files:
+                {
+                    src: ['scroll-animate.js']
+                }
+            }
+        },
+        watch: {
+            karma: {
+                files: ['scroll-animate.js', 'tests/specs/**/*.js'],
+                tasks: ['karma:watch:run']
+            }
+        },
+        karma: {
+            options:
+            {
+                configFile: 'tests/karma.conf.js',
+                separator: '',
+                preprocessors: {
+                    'scroll-animate.js': 'coverage'
+                },
+            },
+            build:
+            {
                 options:
                 {
-                    specs: 'tests/specs/*Spec.js',
-                    vendor: 'tests/vendor/*.js'
+                    singleRun: true,
+                    browsers: ['PhantomJS'],
+                    logLevel: 'INFO'
+                }
+            },
+            watch:
+            {
+                options:
+                {
+                    background: true,
+                    browsers: ['PhantomJS'],
+                    logLevel: 'ERROR',
+                    reporters: ['dots', 'coverage']
+                }
+            },
+            all:
+            {
+                options:
+                {
+                    singleRun: true,
+                    browsers: ['PhantomJS', 'Chrome', 'Firefox', 'Safari'],
+                    logLevel: 'INFO'
                 }
             }
         },
@@ -72,9 +115,9 @@ module.exports = function (grunt)
 	|
 	*/
 
-    grunt.registerTask('lint', ['jshint']);
-    grunt.registerTask('test', ['lint', 'jasmine']);
+    grunt.registerTask('lint', ['jshint', 'jsvalidate']);
+    grunt.registerTask('test', ['lint', 'karma:build']);
 
     grunt.registerTask('build', ['test', 'uglify']);
-    grunt.registerTask('default', ['build']);
+    grunt.registerTask('default', ['karma:watch:start', 'watch']);
 };

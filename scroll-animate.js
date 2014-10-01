@@ -442,7 +442,7 @@
     function extend(src, dest) {
         for(var i in dest) {
             if(typeof dest[i] === 'object') {
-                src[i] = extend(src[i], dest[i]);
+                src[i] = extend(src[i] || {}, dest[i]);
             } else if(typeof src[i] === 'undefined') {
                 src[i] = dest[i];
             }
