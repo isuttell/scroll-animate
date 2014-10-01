@@ -1,6 +1,6 @@
 # Scroll Animate
 
-Animates elements by scroll position. Currently requires LoDash and jQuery. Supports AMD.
+Animates elements by scroll position. Currently requires jQuery. Supports AMD.
 
 [![Build Status](https://travis-ci.org/isuttell/scroll-animate.svg)](https://travis-ci.org/isuttell/scroll-animate)
 
@@ -53,7 +53,3 @@ ScrollAnimate
 	})
 	.run();
 ````
-
-## Todo
-
-* Remove dependancy on LoDash
