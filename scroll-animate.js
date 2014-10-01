@@ -155,6 +155,15 @@
     var items = [];
 
     /**
+     * Function to return a copy of every item
+     *
+     * @return    {Array}
+     */
+    ScrollAnimate._getItems = function() {
+        return items;
+    };
+
+    /**
      * Scroller starts paused until either 'run' or 'play' is called
      *
      * @type    {Boolean}
@@ -270,7 +279,7 @@
     /**
      * Clears the list of items to animate
      */
-    ScrollAnimate.reset = function() {
+    ScrollAnimate.clear = function() {
         items = [];
 
         return this;
@@ -291,20 +300,18 @@
     ScrollAnimate.add = function(options) {
         options = extend(options, itemDefaults);
         if(options.$el) {
+            options.id = 'el' + idCount++;
             for(var i = 0; i < items.length; i++) {
                 if(options.$el.is(items[i].$el)) {
                     options.id = items[i].id;
-                    break;
-                } else {
-                    options.id = 'el' + idCount++;
                 }
             }
+
             if(typeof options.tween === 'function') {
                 options.tween = options.tween(options.$el).pause();
             }
             items.push(options);
         }
-
         // Chaining
         return this;
     };
@@ -333,8 +340,6 @@
 
         var scrollTop = $(window).scrollTop(),
             i;
-
-        // console.log(scrollTop, lastScrollTop, scrollTop !== lastScrollTop);
 
         // Only update styles when the scroll top has changed
         if(paused !== true && scrollTop !== lastScrollTop) {
