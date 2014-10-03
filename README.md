@@ -23,6 +23,7 @@ ScrollAnimate
             start: 0,
             stop: 100
         },
+        ease: 'ExpoInOut',
         property: 'transform',
         transform: 'translateX(%s%)' // %s is replaced with the current value
 	})
@@ -37,7 +38,8 @@ ScrollAnimate
             start: 0,
             stop: 1
         },
-        property: 'opacity'
+        ease: 'SineInOut',
+        property: 'opacity',
 	})
 	// GSAP's Tweens and Timelines
 	.add({
@@ -53,3 +55,35 @@ ScrollAnimate
 	})
 	.run();
 ````
+
+### Easing
+
+You can specify any of the follow easing function to the default property tweens:
+
+* QuadIn
+* QuadOut
+* QuadInOut
+* CubicIn
+* CubicOut
+* CubicInOut
+* QuartIn
+* QuartOut
+* QuartInOut
+* QuintIn
+* QuintOut
+* QuintInOut
+* SineIn
+* SineOut
+* SineInOut
+* ExpoIn
+* ExpoOut
+* ExpoInOut
+* CircIn
+* CircOut
+* CircInOut
+* ElasticIn
+* ElasticOut
+* ElasticInOut
+* BounceIn
+* BounceOut
+* BounceInOut

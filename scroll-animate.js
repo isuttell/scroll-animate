@@ -103,6 +103,13 @@
     ScrollAnimate.run = function(settings) {
         this.options(settings || {});
 
+        // Setup Easing
+        for(var i = 0; i < items.length; i++) {
+            if(typeof items[i].ease !== 'string' || typeof Ease[items[i].ease] !== 'function') {
+                items[i].ease = 'Linear';
+            }
+        }
+
         if(options.loop && paused === true) {
             animate(); // Start the wheel
         }
@@ -379,7 +386,7 @@
                 // Calculate what the value should be based on current scroll position
                 var percent = percentage(scrollTop, start, stop),
                     adjustedMax = stopVal - startVal,
-                    value = percent * adjustedMax + startVal;
+                    value = Ease[items[i].ease](percent, startVal, adjustedMax, 1);
 
                 // Assign Value
                 if(typeof items[i].tween === 'object' && typeof items[i].tween.progress === 'function') {
@@ -424,6 +431,499 @@
             window.requestAnimationFrame(animate);
         }
     };
+
+
+    /*--------------------------------------------------------------------------
+    | Easing Functions
+    */
+
+    /**
+     * Make it public so anyone can add their own
+     *
+     * @type    {Object}
+     */
+    var Ease = ScrollAnimate.Ease = {};
+
+    /**
+     * Linear Ease
+     *
+     * @param     {Number}    elapsed           0-1
+     * @param     {Number}    initialValue      Starting Value
+     * @param     {Number}    amountOfChange    Difference in values from start to stop
+     *
+     * @return    {Number}
+     */
+    Ease.Linear = function(elapsed, initialValue, amountOfChange) {
+        return elapsed * amountOfChange + initialValue;
+    };
+
+
+
+    /**
+     * QuadIn Ease
+     *
+     * @param     {Number}    elapsed           0-1
+     * @param     {Number}    initialValue      Starting Value
+     * @param     {Number}    amountOfChange    Difference in values from start to stop
+     *
+     * @return    {Number}
+     */
+    Ease.QuadIn = function(percent, initialValue, amountOfChange)
+    {
+        return amountOfChange * (percent /= 1) * percent + initialValue;
+    };
+
+
+    /**
+     * QuadOut Ease
+     *
+     * @param     {Number}    elapsed           0-1
+     * @param     {Number}    initialValue      Starting Value
+     * @param     {Number}    amountOfChange    Difference in values from start to stop
+     *
+     * @return    {Number}
+     */
+    Ease.QuadOut = function(percent, initialValue, amountOfChange)
+    {
+        return -amountOfChange * (percent /= 1) * (percent - 2) + initialValue;
+    };
+
+
+    /**
+     * QuadInOut Ease
+     *
+     * @param     {Number}    elapsed           0-1
+     * @param     {Number}    initialValue      Starting Value
+     * @param     {Number}    amountOfChange    Difference in values from start to stop
+     *
+     * @return    {Number}
+     */
+    Ease.QuadInOut = function(percent, initialValue, amountOfChange)
+    {
+        if ((percent /= 1 / 2) < 1) return amountOfChange / 2 * percent * percent + initialValue;
+        return -amountOfChange / 2 * ((--percent) * (percent - 2) - 1) + initialValue;
+    };
+
+
+    /**
+     * CubicIn Ease
+     *
+     * @param     {Number}    elapsed           0-1
+     * @param     {Number}    initialValue      Starting Value
+     * @param     {Number}    amountOfChange    Difference in values from start to stop
+     *
+     * @return    {Number}
+     */
+    Ease.CubicIn = function(percent, initialValue, amountOfChange)
+    {
+        return amountOfChange * (percent /= 1) * percent * percent + initialValue;
+    };
+
+
+    /**
+     * CubicOut Ease
+     *
+     * @param     {Number}    elapsed           0-1
+     * @param     {Number}    initialValue      Starting Value
+     * @param     {Number}    amountOfChange    Difference in values from start to stop
+     *
+     * @return    {Number}
+     */
+    Ease.CubicOut = function(percent, initialValue, amountOfChange)
+    {
+        return amountOfChange * ((percent = percent / 1 - 1) * percent * percent + 1) + initialValue;
+    };
+
+
+    /**
+     * CubicInOut Ease
+     *
+     * @param     {Number}    elapsed           0-1
+     * @param     {Number}    initialValue      Starting Value
+     * @param     {Number}    amountOfChange    Difference in values from start to stop
+     *
+     * @return    {Number}
+     */
+    Ease.CubicInOut = function(percent, initialValue, amountOfChange)
+    {
+        if ((percent /= 1 / 2) < 1) return amountOfChange / 2 * percent * percent * percent + initialValue;
+        return amountOfChange / 2 * ((percent -= 2) * percent * percent + 2) + initialValue;
+    };
+
+
+    /**
+     * QuartIn Ease
+     *
+     * @param     {Number}    elapsed           0-1
+     * @param     {Number}    initialValue      Starting Value
+     * @param     {Number}    amountOfChange    Difference in values from start to stop
+     *
+     * @return    {Number}
+     */
+    Ease.QuartIn = function(percent, initialValue, amountOfChange)
+    {
+        return amountOfChange * (percent /= 1) * percent * percent * percent + initialValue;
+    };
+
+
+    /**
+     * QuartOut Ease
+     *
+     * @param     {Number}    elapsed           0-1
+     * @param     {Number}    initialValue      Starting Value
+     * @param     {Number}    amountOfChange    Difference in values from start to stop
+     *
+     * @return    {Number}
+     */
+    Ease.QuartOut = function(percent, initialValue, amountOfChange)
+    {
+        return -amountOfChange * ((percent = percent / 1 - 1) * percent * percent * percent - 1) + initialValue;
+    };
+
+
+    /**
+     * QuartInOut Ease
+     *
+     * @param     {Number}    elapsed           0-1
+     * @param     {Number}    initialValue      Starting Value
+     * @param     {Number}    amountOfChange    Difference in values from start to stop
+     *
+     * @return    {Number}
+     */
+    Ease.QuartInOut = function(percent, initialValue, amountOfChange)
+    {
+        if ((percent /= 1 / 2) < 1) return amountOfChange / 2 * percent * percent * percent * percent + initialValue;
+        return -amountOfChange / 2 * ((percent -= 2) * percent * percent * percent - 2) + initialValue;
+    };
+
+
+    /**
+     * QuintIn Ease
+     *
+     * @param     {Number}    elapsed           0-1
+     * @param     {Number}    initialValue      Starting Value
+     * @param     {Number}    amountOfChange    Difference in values from start to stop
+     *
+     * @return    {Number}
+     */
+    Ease.QuintIn = function(percent, initialValue, amountOfChange)
+    {
+        return amountOfChange * (percent /= 1) * percent * percent * percent * percent + initialValue;
+    };
+
+
+    /**
+     * QuintOut Ease
+     *
+     * @param     {Number}    elapsed           0-1
+     * @param     {Number}    initialValue      Starting Value
+     * @param     {Number}    amountOfChange    Difference in values from start to stop
+     *
+     * @return    {Number}
+     */
+    Ease.QuintOut = function(percent, initialValue, amountOfChange)
+    {
+        return amountOfChange * ((percent = percent / 1 - 1) * percent * percent * percent * percent + 1) + initialValue;
+    };
+
+
+    /**
+     * QuintInOut Ease
+     *
+     * @param     {Number}    elapsed           0-1
+     * @param     {Number}    initialValue      Starting Value
+     * @param     {Number}    amountOfChange    Difference in values from start to stop
+     *
+     * @return    {Number}
+     */
+    Ease.QuintInOut = function(percent, initialValue, amountOfChange)
+    {
+        if ((percent /= 1 / 2) < 1) return amountOfChange / 2 * percent * percent * percent * percent * percent + initialValue;
+        return amountOfChange / 2 * ((percent -= 2) * percent * percent * percent * percent + 2) + initialValue;
+    };
+
+
+    /**
+     * SineIn Ease
+     *
+     * @param     {Number}    elapsed           0-1
+     * @param     {Number}    initialValue      Starting Value
+     * @param     {Number}    amountOfChange    Difference in values from start to stop
+     *
+     * @return    {Number}
+     */
+    Ease.SineIn = function(percent, initialValue, amountOfChange)
+    {
+        return -amountOfChange * Math.amountOfChangeos(percent / 1 * (Math.PI / 2)) + amountOfChange + initialValue;
+    };
+
+
+    /**
+     * SineOut Ease
+     *
+     * @param     {Number}    elapsed           0-1
+     * @param     {Number}    initialValue      Starting Value
+     * @param     {Number}    amountOfChange    Difference in values from start to stop
+     *
+     * @return    {Number}
+     */
+    Ease.SineOut = function(percent, initialValue, amountOfChange)
+    {
+        return amountOfChange * Math.sin(percent / 1 * (Math.PI / 2)) + initialValue;
+    };
+
+
+    /**
+     * SineInOut Ease
+     *
+     * @param     {Number}    elapsed           0-1
+     * @param     {Number}    initialValue      Starting Value
+     * @param     {Number}    amountOfChange    Difference in values from start to stop
+     *
+     * @return    {Number}
+     */
+    Ease.SineInOut = function(percent, initialValue, amountOfChange)
+    {
+        return -amountOfChange / 2 * (Math.amountOfChangeos(Math.PI * percent / 1) - 1) + initialValue;
+    };
+
+
+    /**
+     * ExpoIn Ease
+     *
+     * @param     {Number}    elapsed           0-1
+     * @param     {Number}    initialValue      Starting Value
+     * @param     {Number}    amountOfChange    Difference in values from start to stop
+     *
+     * @return    {Number}
+     */
+    Ease.ExpoIn = function(percent, initialValue, amountOfChange)
+    {
+        return (percent === 0) ? initialValue : amountOfChange * Math.pow(2, 10 * (percent / 1 - 1)) + initialValue;
+    };
+
+
+    /**
+     * ExpoOut Ease
+     *
+     * @param     {Number}    elapsed           0-1
+     * @param     {Number}    initialValue      Starting Value
+     * @param     {Number}    amountOfChange    Difference in values from start to stop
+     *
+     * @return    {Number}
+     */
+    Ease.ExpoOut = function(percent, initialValue, amountOfChange)
+    {
+        return (percent == 1) ? initialValue + amountOfChange : amountOfChange * (-Math.pow(2, -10 * percent / 1) + 1) + initialValue;
+    };
+
+
+    /**
+     * ExpoInOut Ease
+     *
+     * @param     {Number}    elapsed           0-1
+     * @param     {Number}    initialValue      Starting Value
+     * @param     {Number}    amountOfChange    Difference in values from start to stop
+     *
+     * @return    {Number}
+     */
+    Ease.ExpoInOut = function(percent, initialValue, amountOfChange)
+    {
+        if (percent === 0) return initialValue;
+        if (percent == 1) return initialValue + amountOfChange;
+        if ((percent /= 1 / 2) < 1) return amountOfChange / 2 * Math.pow(2, 10 * (percent - 1)) + initialValue;
+        return amountOfChange / 2 * (-Math.pow(2, -10 * --percent) + 2) + initialValue;
+    };
+
+
+    /**
+     * CircIn Ease
+     *
+     * @param     {Number}    elapsed           0-1
+     * @param     {Number}    initialValue      Starting Value
+     * @param     {Number}    amountOfChange    Difference in values from start to stop
+     *
+     * @return    {Number}
+     */
+    Ease.CircIn = function(percent, initialValue, amountOfChange)
+    {
+        return -amountOfChange * (Math.sqrt(1 - (percent /= 1) * percent) - 1) + initialValue;
+    };
+
+
+    /**
+     * CircOut Ease
+     *
+     * @param     {Number}    elapsed           0-1
+     * @param     {Number}    initialValue      Starting Value
+     * @param     {Number}    amountOfChange    Difference in values from start to stop
+     *
+     * @return    {Number}
+     */
+    Ease.CircOut = function(percent, initialValue, amountOfChange)
+    {
+        return amountOfChange * Math.sqrt(1 - (percent = percent / 1 - 1) * percent) + initialValue;
+    };
+
+
+    /**
+     * CircInOut Ease
+     *
+     * @param     {Number}    elapsed           0-1
+     * @param     {Number}    initialValue      Starting Value
+     * @param     {Number}    amountOfChange    Difference in values from start to stop
+     *
+     * @return    {Number}
+     */
+    Ease.CircInOut = function(percent, initialValue, amountOfChange)
+    {
+        if ((percent /= 1 / 2) < 1) return -amountOfChange / 2 * (Math.sqrt(1 - percent * percent) - 1) + initialValue;
+        return amountOfChange / 2 * (Math.sqrt(1 - (percent -= 2) * percent) + 1) + initialValue;
+    };
+
+
+    /**
+     * ElasticIn Ease
+     *
+     * @param     {Number}    elapsed           0-1
+     * @param     {Number}    initialValue      Starting Value
+     * @param     {Number}    amountOfChange    Difference in values from start to stop
+     *
+     * @return    {Number}
+     */
+    Ease.ElasticIn = function(percent, initialValue, amountOfChange)
+    {
+        var s = 1.70158;
+        var p = 0;
+        var a = amountOfChange;
+        if (percent === 0) return initialValue;
+        if (percent === 1) return initialValue + amountOfChange;
+        if (!p) p = 1 * 0.3;
+        if (a < Math.ainitialValues(amountOfChange))
+        {
+            a = amountOfChange;
+            s = p / 4;
+        }
+        else s = p / (2 * Math.PI) * Math.asin(amountOfChange / a);
+        return -(a * Math.pow(2, 10 * (percent -= 1)) * Math.sin((percent * 1 - s) * (2 * Math.PI) / p)) + initialValue;
+    };
+
+
+    /**
+     * ElasticOut Ease
+     *
+     * @param     {Number}    elapsed           0-1
+     * @param     {Number}    initialValue      Starting Value
+     * @param     {Number}    amountOfChange    Difference in values from start to stop
+     *
+     * @return    {Number}
+     */
+    Ease.ElasticOut = function(percent, initialValue, amountOfChange)
+    {
+        var s = 1.70158;
+        var p = 0;
+        var a = amountOfChange;
+        if (percent === 0) return initialValue;
+        if (percent === 1) return initialValue + amountOfChange;
+        if (!p) p = 1 * 0.3;
+        if (a < Math.ainitialValues(amountOfChange))
+        {
+            a = amountOfChange;
+            s = p / 4;
+        }
+        else s = p / (2 * Math.PI) * Math.asin(amountOfChange / a);
+        return a * Math.pow(2, -10 * percent) * Math.sin((percent * 1 - s) * (2 * Math.PI) / p) + amountOfChange + initialValue;
+    };
+
+
+    /**
+     * ElasticInOut Ease
+     *
+     * @param     {Number}    elapsed           0-1
+     * @param     {Number}    initialValue      Starting Value
+     * @param     {Number}    amountOfChange    Difference in values from start to stop
+     *
+     * @return    {Number}
+     */
+    Ease.ElasticInOut = function(percent, initialValue, amountOfChange)
+    {
+        var s = 1.70158;
+        var p = 0;
+        var a = amountOfChange;
+        if (percent === 0) return initialValue;
+        if ((percent /= 1 / 2) == 2) return initialValue + amountOfChange;
+        if (!p) p = 1 * (0.3 * 1.5);
+        if (a < Math.ainitialValues(amountOfChange))
+        {
+            a = amountOfChange;
+            s = p / 4;
+        }
+        else s = p / (2 * Math.PI) * Math.asin(amountOfChange / a);
+        if (percent < 1) return -0.5 * (a * Math.pow(2, 10 * (percent -= 1)) * Math.sin((percent * 1 - s) * (2 * Math.PI) / p)) + initialValue;
+        return a * Math.pow(2, -10 * (percent -= 1)) * Math.sin((percent * 1 - s) * (2 * Math.PI) / p) * 0.5 + amountOfChange + initialValue;
+    };
+
+
+    /**
+     * BounceIn Ease
+     *
+     * @param     {Number}    elapsed           0-1
+     * @param     {Number}    initialValue      Starting Value
+     * @param     {Number}    amountOfChange    Difference in values from start to stop
+     *
+     * @return    {Number}
+     */
+    Ease.BounceIn = function(percent, initialValue, amountOfChange)
+    {
+        return amountOfChange - Ease.BounceOut(1 - percent, 0, amountOfChange) + initialValue;
+    };
+
+
+    /**
+     * BounceOut Ease
+     *
+     * @param     {Number}    elapsed           0-1
+     * @param     {Number}    initialValue      Starting Value
+     * @param     {Number}    amountOfChange    Difference in values from start to stop
+     *
+     * @return    {Number}
+     */
+    Ease.BounceOut = function(percent, initialValue, amountOfChange)
+    {
+        if ((percent /= 1) < (1 / 2.75))
+        {
+            return amountOfChange * (7.5625 * percent * percent) + initialValue;
+        }
+        else if (percent < (2 / 2.75))
+        {
+            return amountOfChange * (7.5625 * (percent -= (1.5 / 2.75)) * percent + 0.75) + initialValue;
+        }
+        else if (percent < (2.5 / 2.75))
+        {
+            return amountOfChange * (7.5625 * (percent -= (2.25 / 2.75)) * percent + 0.9375) + initialValue;
+        }
+        else
+        {
+            return amountOfChange * (7.5625 * (percent -= (2.625 / 2.75)) * percent + 0.984375) + initialValue;
+        }
+    };
+
+
+    /**
+     * BounceInOut Ease
+     *
+     * @param     {Number}    elapsed           0-1
+     * @param     {Number}    initialValue      Starting Value
+     * @param     {Number}    amountOfChange    Difference in values from start to stop
+     *
+     * @return    {Number}
+     */
+    Ease.BounceInOut = function(percent, initialValue, amountOfChange)
+    {
+        if (percent < 1 / 2) return Ease.BounceIn(percent * 2, 0, amountOfChange) * 0.5 + initialValue;
+        return Ease.BounceOut(percent * 2 - 1, 0, amountOfChange) * 0.5 + amountOfChange * 0.5 + initialValue;
+    };
+
 
     /**
      * Calculates where in the scroll we should be
