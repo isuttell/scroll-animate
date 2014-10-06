@@ -16,6 +16,18 @@
 			background-color: red;
 			position: fixed;
 		}
+		.box-1 {
+			background-color: navy;
+			top: 10px;
+		}
+		.box-2 {
+			background-color: green;
+			top: 70px;
+		}
+		.box-3 {
+			background-color: purple;
+			top: 130px;
+		}
 		#toggle {
 			position: fixed;
 			right: 10px;
@@ -26,7 +38,9 @@
 <body>
 	<button id="toggle" type="toggle">Toggle</button>
 	<div class="container">
-		<div class="box"></div>
+		<div class="box box-1"></div>
+		<div class="box box-2"></div>
+		<div class="box box-3"></div>
 	</div>
 	<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.1/jquery.js"></script>
 	<script src="http://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
@@ -34,7 +48,7 @@
 	<script>
 		ScrollAnimate
 		.add({
-			$el : $('.box'),
+			$el : $('.box-1'),
                 scroll: {
                     start: 0,
                     stop: function() {
@@ -50,8 +64,59 @@
                 property: 'transform',
                 transform: 'translateX(%s%)'
 		})
+		.add({
+			$el : $('.box-2'),
+                scroll: {
+                    start: 0,
+                    stop: function() {
+                        return $(document).height() - $(window).height();
+                    }
+                },
+                values: {
+                    start: 0,
+                    stop: function() {
+                    	return $(document).width();
+                    }
+                },
+                ease: 'ExpoInOut',
+                property: 'transform',
+                transform: 'translateX(%s%)'
+		})
+		.add({
+			$el : $('.box-3'),
+                scroll: {
+                    start: 0,
+                    stop: function() {
+                        return $(document).height() - $(window).height();
+                    }
+                },
+                values: {
+                    start: 0,
+                    stop: function() {
+                    	return $(document).width();
+                    }
+                },
+                ease: 'SineOut',
+                property: 'transform',
+                transform: 'translateX(%s%)'
+		})
+		.add({
+			$el : $('.box-3'),
+                scroll: {
+                    start: 0,
+                    stop: function() {
+                        return $(document).height() - $(window).height();
+                    }
+                },
+                values: {
+                    start: 1,
+                    stop: 0.1
+                },
+                ease: 'CubicOut',
+                property: 'opacity',
+		})
 		.run({
-			loop: false,
+			loop: true,
 			smoothScroll: {
 				enabled: false,
 				speed: 15

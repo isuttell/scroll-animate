@@ -360,7 +360,7 @@
 
         // Only update styles when the scroll top has changed
         if(paused === false && scrollTop !== lastScrollTop) {
-            var transforms = [];
+            var targets = [];
 
             for(i = 0; i < items.length; i++) {
                 // start and stop
@@ -393,20 +393,21 @@
                     // Greensock TweenMax Support
                     items[i].tween.progress(percent);
                 } else if (items[i].property === 'transform') {
-                    // Transforms have to be applied after everything else as we have to concat multiple
-                    // properties together
-                    transforms[items[i].id] = transforms[items[i].id] || { $el: items[i].$el, value: ''};
-                    transforms[items[i].id].value += ' ' + items[i].transform.replace('%s', value);
+                    // Concat multiple transforms together
+                    targets[items[i].id] = targets[items[i].id] || { $el: items[i].$el, css: { transform: '' } };
+                    targets[items[i].id].css.transform += ' ' + items[i].transform.replace('%s', value);
                 } else if (items[i].property === 'scrollTop') {
                     items[i].$el.scrollTop(value);
                 } else {
-                    items[i].$el.css(items[i].property, value);
+                    // Save it to an object so we can apply multiply properties once
+                    targets[items[i].id] = targets[items[i].id] || { $el: items[i].$el, css: {} };
+                    targets[items[i].id].css[items[i].property] = value;
                 }
             }
 
-            // Apply css3 concated transforms
-            for(i in transforms){
-                transforms[i].$el.css('transform', transforms[i].value);
+            // Apply css one time per loop per item
+            for(i in targets){
+                targets[i].$el.css(targets[i].css);
             }
         }
         lastScrollTop = scrollTop;
