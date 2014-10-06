@@ -799,7 +799,7 @@
         if (percent === 0) return initialValue;
         if (percent === 1) return initialValue + amountOfChange;
         if (!p) p = 1 * 0.3;
-        if (a < Math.ainitialValues(amountOfChange))
+        if (a < Math.abs(amountOfChange))
         {
             a = amountOfChange;
             s = p / 4;
@@ -826,7 +826,7 @@
         if (percent === 0) return initialValue;
         if (percent === 1) return initialValue + amountOfChange;
         if (!p) p = 1 * 0.3;
-        if (a < Math.ainitialValues(amountOfChange))
+        if (a < Math.abs(amountOfChange))
         {
             a = amountOfChange;
             s = p / 4;
