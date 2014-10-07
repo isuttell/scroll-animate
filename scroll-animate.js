@@ -342,6 +342,13 @@
     var lastScrollTop = null;
 
     /**
+     * Utility PI Var
+     *
+     * @type    {Number}
+     */
+    var PI2 = Math.PI * 2;
+
+    /**
      * Upates the each item's property
      *
      * Each item will have a property value. This can either be a string or an object.
@@ -655,7 +662,7 @@
      */
     Ease.SineIn = function(percent, initialValue, amountOfChange)
     {
-        return -amountOfChange * Math.amountOfChangeos(percent / 1 * (Math.PI / 2)) + amountOfChange + initialValue;
+        return -amountOfChange * Math.cos(percent / 1 * (Math.PI / 2)) + amountOfChange + initialValue;
     };
 
 
@@ -685,7 +692,7 @@
      */
     Ease.SineInOut = function(percent, initialValue, amountOfChange)
     {
-        return -amountOfChange / 2 * (Math.amountOfChangeos(Math.PI * percent / 1) - 1) + initialValue;
+        return -amountOfChange / 2 * (Math.cos(Math.PI * percent / 1) - 1) + initialValue;
     };
 
 
@@ -805,8 +812,8 @@
             a = amountOfChange;
             s = p / 4;
         }
-        else s = p / (2 * Math.PI) * Math.asin(amountOfChange / a);
-        return -(a * Math.pow(2, 10 * (percent -= 1)) * Math.sin((percent * 1 - s) * (2 * Math.PI) / p)) + initialValue;
+        else s = p / PI2 * Math.asin(amountOfChange / a);
+        return -(a * Math.pow(2, 10 * (percent -= 1)) * Math.sin((percent * 1 - s) * PI2 / p)) + initialValue;
     };
 
 
@@ -832,8 +839,8 @@
             a = amountOfChange;
             s = p / 4;
         }
-        else s = p / (2 * Math.PI) * Math.asin(amountOfChange / a);
-        return a * Math.pow(2, -10 * percent) * Math.sin((percent * 1 - s) * (2 * Math.PI) / p) + amountOfChange + initialValue;
+        else s = p / PI2 * Math.asin(amountOfChange / a);
+        return a * Math.pow(2, -10 * percent) * Math.sin((percent * 1 - s) * PI2 / p) + amountOfChange + initialValue;
     };
 
 
@@ -854,14 +861,14 @@
         if (percent === 0) return initialValue;
         if ((percent /= 1 / 2) == 2) return initialValue + amountOfChange;
         if (!p) p = 1 * (0.3 * 1.5);
-        if (a < Math.ainitialValues(amountOfChange))
+        if (a < Math.abs(amountOfChange))
         {
             a = amountOfChange;
             s = p / 4;
         }
-        else s = p / (2 * Math.PI) * Math.asin(amountOfChange / a);
-        if (percent < 1) return -0.5 * (a * Math.pow(2, 10 * (percent -= 1)) * Math.sin((percent * 1 - s) * (2 * Math.PI) / p)) + initialValue;
-        return a * Math.pow(2, -10 * (percent -= 1)) * Math.sin((percent * 1 - s) * (2 * Math.PI) / p) * 0.5 + amountOfChange + initialValue;
+        else s = p / PI2 * Math.asin(amountOfChange / a);
+        if (percent < 1) return -0.5 * (a * Math.pow(2, 10 * (percent -= 1)) * Math.sin((percent * 1 - s) * PI2 / p)) + initialValue;
+        return a * Math.pow(2, -10 * (percent -= 1)) * Math.sin((percent * 1 - s) * PI2 / p) * 0.5 + amountOfChange + initialValue;
     };
 
 
