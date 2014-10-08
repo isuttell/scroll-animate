@@ -422,6 +422,10 @@
                     // Concat multiple transforms together
                     targets[items[i].id] = targets[items[i].id] || { $el: items[i].$el, css: { transform: '' } };
                     targets[items[i].id].css.transform += ' ' + items[i].transform.replace('%s', items[i]._currentValue);
+                } else if (items[i].property === 'filter') {
+                    // Concat multiple transforms together
+                    targets[items[i].id] = targets[items[i].id] || { $el: items[i].$el, css: {} };
+                    targets[items[i].id].css['-webkit-filter'] = items[i].filter.replace('%s', items[i]._currentValue);
                 } else if (items[i].property === 'scrollTop') {
                     items[i].$el.scrollTop(items[i]._currentValue);
                 } else {
