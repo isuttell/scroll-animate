@@ -110,16 +110,18 @@
             }
         }
 
+        // Make sure to only start the wheel once
         if(options.loop && paused === true) {
+            paused = false;
             animate(); // Start the wheel
+        } else {
+            paused = false;
         }
 
         // If events are not connected then connect them
         if(eventsInitialized === false) {
             this.addEventListeners();
         }
-
-        paused = false;
 
         return this;
     };
@@ -392,8 +394,9 @@
 
                 // Calculate what the value should be based on current scroll position
                 var percent = percentage(scrollTop, start, stop),
-                    adjustedMax = stopVal - startVal,
-                    value = Ease[items[i].ease](percent, startVal, adjustedMax, 1);
+                    adjustedMax = stopVal - startVal;
+
+                items[i]._currentValue = Ease[items[i].ease](percent, startVal, adjustedMax, 1);
 
                 // Assign Value
                 if(typeof items[i].tween === 'object' && typeof items[i].tween.progress === 'function') {
@@ -402,13 +405,13 @@
                 } else if (items[i].property === 'transform') {
                     // Concat multiple transforms together
                     targets[items[i].id] = targets[items[i].id] || { $el: items[i].$el, css: { transform: '' } };
-                    targets[items[i].id].css.transform += ' ' + items[i].transform.replace('%s', value);
+                    targets[items[i].id].css.transform += ' ' + items[i].transform.replace('%s', items[i]._currentValue);
                 } else if (items[i].property === 'scrollTop') {
-                    items[i].$el.scrollTop(value);
+                    items[i].$el.scrollTop(items[i]._currentValue);
                 } else {
                     // Save it to an object so we can apply multiply properties once
                     targets[items[i].id] = targets[items[i].id] || { $el: items[i].$el, css: {} };
-                    targets[items[i].id].css[items[i].property] = value;
+                    targets[items[i].id].css[items[i].property] = items[i]._currentValue;
                 }
             }
 
