@@ -351,6 +351,22 @@
     var PI2 = Math.PI * 2;
 
     /**
+     * Document Elemenet
+     *
+     * @type    {Object}
+     */
+    var doc = document.documentElement;
+
+    /**
+     * Get the scroll position of the window
+     *
+     * @return    {Number}
+     */
+    function getScrollTop() {
+        return (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0);
+    }
+
+    /**
      * Upates the each item's property
      *
      * Each item will have a property value. This can either be a string or an object.
@@ -364,7 +380,7 @@
         /*--------------------------------------------------------------------------
         | Update item Properties
         */
-        var scrollTop = $(window).scrollTop(),
+        var scrollTop = getScrollTop(),
             i;
 
         // Only update styles when the scroll top has changed
