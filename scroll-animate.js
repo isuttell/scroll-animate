@@ -56,7 +56,6 @@
      * @type    {Object}
      */
     var options = {
-        loop: true,
         smoothScroll: {
             enabled: false,
             speed: 15
@@ -69,6 +68,7 @@
      * @type    {Object}
      */
     var itemDefaults = {
+        _currentValue: 0,
         $el: false,
         scroll: {
             min: 0,
@@ -103,19 +103,10 @@
     ScrollAnimate.run = function(settings) {
         this.options(settings || {});
 
-        // Setup Easing
-        for(var i = 0; i < items.length; i++) {
-            if(typeof items[i].ease !== 'string' || typeof Ease[items[i].ease] !== 'function') {
-                items[i].ease = 'Linear';
-            }
-        }
-
-        // Make sure to only start the wheel once
-        if(options.loop && paused === true) {
-            paused = false;
-            animate(); // Start the wheel
-        } else {
-            paused = false;
+        paused = false;
+        // Start the wheel
+        if(false === loopStarted) {
+            loop();
         }
 
         // If events are not connected then connect them
@@ -124,6 +115,14 @@
         }
 
         return this;
+    };
+
+
+    /**
+     * Manually trigger an update
+     */
+    ScrollAnimate.update = function() {
+        update();
     };
 
     /**
@@ -245,7 +244,7 @@
     var scrollEvent = function() {
         if((new Date()).getTime() - scrollThrottle > 16) {
             scrollThrottle = (new Date()).getTime();
-            window.requestAnimationFrame(animate);
+            window.requestAnimationFrame(loop);
         }
     };
 
@@ -289,11 +288,6 @@
         } else if (event.originalEvent.detail) {
             mouseDelta = -event.originalEvent.detail / 3;
         }
-
-        /*jshint validthis:true */
-        if(!options.loop) {
-            scrollEvent();
-        }
     }
 
     /**
@@ -330,6 +324,11 @@
             if(typeof options.tween === 'function') {
                 options.tween = options.tween(options.$el).pause();
             }
+
+            if(typeof options.ease !== 'string' || typeof Ease[options.ease] !== 'function') {
+                options.ease = 'Linear';
+            }
+
             items.push(options);
         }
         // Chaining
@@ -362,9 +361,16 @@
      *
      * @return    {Number}
      */
-    function getScrollTop() {
+    var getScrollTop = ScrollAnimate.getScrollTop = function() {
         return (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0);
-    }
+    };
+
+    /**
+     * Track if the loop has already been started
+     *
+     * @type    {Boolean}
+     */
+    var loopStarted = false;
 
     /**
      * Upates the each item's property
@@ -376,77 +382,23 @@
      *     string: (String)            css value will be inserted at '%s' e.g. 'translateX(%spx)''
      * }
      */
-    var animate = function() {
+    function loop() {
+        loopStarted = true;
         /*--------------------------------------------------------------------------
         | Update item Properties
         */
-        var scrollTop = getScrollTop(),
-            i;
+        var scrollTop = getScrollTop();
 
         // Only update styles when the scroll top has changed
-        if(paused === false && scrollTop !== lastScrollTop) {
-            var targets = [];
-
-            for(i = 0; i < items.length; i++) {
-                // start and stop
-                var start = items[i].scroll.start,
-                    stop = items[i].scroll.stop;
-                if(typeof start === 'function') {
-                    start = start(items[i].$el);
-                }
-                if(typeof stop === 'function') {
-                    stop = stop(items[i].$el);
-                }
-
-                // values
-                var startVal = items[i].values.start,
-                    stopVal = items[i].values.stop;
-                if(typeof startVal === 'function') {
-                    startVal = startVal(items[i].$el);
-                }
-                if(typeof stopVal === 'function') {
-                    stopVal = stopVal(items[i].$el);
-                }
-
-                // Calculate what the value should be based on current scroll position
-                var percent = percentage(scrollTop, start, stop),
-                    adjustedMax = stopVal - startVal;
-
-                items[i]._currentValue = Ease[items[i].ease](percent, startVal, adjustedMax, 1);
-
-                // Assign Value
-                if(typeof items[i].tween === 'object' && typeof items[i].tween.progress === 'function') {
-                    // Greensock TweenMax Support
-                    items[i].tween.progress(percent);
-                } else if (items[i].property === 'transform') {
-                    // Concat multiple transforms together
-                    targets[items[i].id] = targets[items[i].id] || { $el: items[i].$el, css: { transform: '' } };
-                    targets[items[i].id].css.transform += ' ' + items[i].transform.replace('%s', items[i]._currentValue);
-                } else if (items[i].property === 'filter') {
-                    // Concat multiple transforms together
-                    targets[items[i].id] = targets[items[i].id] || { $el: items[i].$el, css: {} };
-                    targets[items[i].id].css['-webkit-filter'] = items[i].filter.replace('%s', items[i]._currentValue);
-                } else if (items[i].property === 'scrollTop') {
-                    items[i].$el.scrollTop(items[i]._currentValue);
-                } else {
-                    // Save it to an object so we can apply multiply properties once
-                    targets[items[i].id] = targets[items[i].id] || { $el: items[i].$el, css: {} };
-                    targets[items[i].id].css[items[i].property] = items[i]._currentValue;
-                }
-            }
-
-            // Apply css one time per loop per item
-            for(i in targets){
-                targets[i].$el.css(targets[i].css);
-            }
+        if(false === paused && scrollTop !== lastScrollTop) {
+            update();
         }
         lastScrollTop = scrollTop;
-
 
         /*--------------------------------------------------------------------------
         | Manually Scroll for smoother scrolling - Scroll Jack
         */
-        if (options.smoothScroll.enabled && mouseWheelActive) {
+        if (true === options.smoothScroll.enabled && true === mouseWheelActive) {
             window.scrollBy(0, -mouseDelta * options.smoothScroll.speed);
             scrollCount++;
 
@@ -458,10 +410,70 @@
             }
         }
 
-        if(options.loop) {
-            window.requestAnimationFrame(animate);
+        window.requestAnimationFrame(loop);
+    }
+
+    /**
+     * Update each element according to scroll top
+     */
+    function update() {
+        var targets = [],
+            i,
+            scrollTop = getScrollTop();
+
+        for(i = 0; i < items.length; i++) {
+            // start and stop
+            var start = items[i].scroll.start,
+                stop = items[i].scroll.stop;
+            if(typeof start === 'function') {
+                start = start(items[i].$el);
+            }
+            if(typeof stop === 'function') {
+                stop = stop(items[i].$el);
+            }
+
+            // values
+            var startVal = items[i].values.start,
+                stopVal = items[i].values.stop;
+            if(typeof startVal === 'function') {
+                startVal = startVal(items[i].$el);
+            }
+            if(typeof stopVal === 'function') {
+                stopVal = stopVal(items[i].$el);
+            }
+
+            // Calculate what the value should be based on current scroll position
+            var percent = tweenPosition(scrollTop, start, stop),
+                adjustedMax = stopVal - startVal;
+
+            items[i]._currentValue = Ease[items[i].ease](percent, startVal, adjustedMax, 1);
+
+            // Assign Value
+            if(typeof items[i].tween === 'object' && typeof items[i].tween.progress === 'function') {
+                // Greensock TweenMax Support
+                items[i].tween.progress(percent);
+            } else if (items[i].property === 'transform') {
+                // Concat multiple transforms together
+                targets[items[i].id] = targets[items[i].id] || { $el: items[i].$el, css: { transform: '' } };
+                targets[items[i].id].css.transform += ' ' + items[i].transform.replace('%s', items[i]._currentValue);
+            } else if (items[i].property === 'filter') {
+                // Concat multiple transforms together
+                targets[items[i].id] = targets[items[i].id] || { $el: items[i].$el, css: {} };
+                targets[items[i].id].css['-webkit-filter'] = items[i].filter.replace('%s', items[i]._currentValue);
+            } else if (items[i].property === 'scrollTop') {
+                items[i].$el.scrollTop(items[i]._currentValue);
+            } else {
+                // Save it to an object so we can apply multiply properties once
+                targets[items[i].id] = targets[items[i].id] || { $el: items[i].$el, css: {} };
+                targets[items[i].id].css[items[i].property] = items[i]._currentValue;
+            }
         }
-    };
+
+        // Apply css one time per loop per item
+        for(i in targets){
+            targets[i].$el.css(targets[i].css);
+        }
+    }
 
 
     /*--------------------------------------------------------------------------
@@ -964,7 +976,7 @@
      *
      * @return    {Number}                 should be between 0 and 1
      */
-    function percentage(scrollTop, start, stop) {
+    function tweenPosition(scrollTop, start, stop) {
 
         var value = scrollTop - start,
             adjustedMax = stop - start;
