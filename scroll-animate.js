@@ -82,6 +82,13 @@
     };
 
     /**
+     * Plugin Version
+     *
+     * @type    {String}
+     */
+    ScrollAnimate.VERSION = '0.3.0';
+
+    /**
      * Update options or return current settings
      *
      * @param     {Object}    settings    optional
