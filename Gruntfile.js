@@ -48,10 +48,23 @@ module.exports = function (grunt)
                 }
             }
         },
+        jscs: {
+            options: {
+              config: ".jscsrc"
+            },
+            sol: {
+              files: {
+                src: ["scroll-animate.js"]
+              }
+            }
+        },
         watch: {
-            karma: {
+            ScrollAnimate: {
                 files: ['scroll-animate.js', 'tests/specs/**/*.js'],
-                tasks: ['karma:watch:run']
+                tasks: ['karma:watch:run', 'lint', 'jscs']
+            },
+            options: {
+                interrupt: true // Interrupt any running tasks on save
             }
         },
         karma: {
@@ -116,7 +129,7 @@ module.exports = function (grunt)
 	*/
 
     grunt.registerTask('lint', ['jshint', 'jsvalidate']);
-    grunt.registerTask('test', ['lint', 'karma:build']);
+    grunt.registerTask('test', ['karma:build', 'lint', 'jscs']);
 
     grunt.registerTask('build', ['test', 'uglify']);
     grunt.registerTask('default', ['karma:watch:start', 'watch']);
