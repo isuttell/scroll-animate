@@ -8,6 +8,14 @@ Animates elements by scroll position. Currently requires jQuery. Supports AMD.
 ### Basics
 
 ````
+// scroll jacking for browsers without smooth scrolling
+ScrollAnimate.options({
+    smoothScroll: {
+        enabled: true,
+        speed: 15
+    }
+});
+
 ScrollAnimate
 	.add({
 		$el : $('.box-1'),
@@ -50,15 +58,22 @@ ScrollAnimate
         },
         tween: function($el) {
             return new TimelineMax()
-                .to($el, 1, { rotation: 180, ease: Cubic.easeIn });
+                .to($el, 1, { rotation: 180, ease: Cubic.easeIn })
+                .to($el, 1, { rotation: 90, ease: Cubic.easeIn });
         }
 	})
 	.run();
+
+
+// You can also call the 'update' method to manully update values
+window.addEventListener('resize', function(){
+    ScrollAnimate.update();
+}, false);
 ````
 
 ### Easing
 
-You can specify any of the follow easing function to the default property tweens:
+You can specify any of the follow easing function to the default `property` tweens:
 
 * QuadIn
 * QuadOut

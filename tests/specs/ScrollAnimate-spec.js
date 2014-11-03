@@ -13,7 +13,6 @@ describe("ScrollAnimate", function() {
 
         beforeEach(function(){
             expectedDefaults = {
-                loop: true,
                 smoothScroll: {
                     enabled: false,
                     speed: 15
@@ -31,14 +30,14 @@ describe("ScrollAnimate", function() {
         });
 
         it("should update options when passed an 'object' as an argument", function(){
-            var actual = ScrollAnimate.options({loop: false}),
+            var actual = ScrollAnimate.options({ smoothScroll: { enabled: true } }),
                 expected = expectedDefaults;
-            expected.loop = false;
+            expected.smoothScroll.enabled = true;
             expect(ScrollAnimate.options()).toEqual(expected);
         });
 
         it("should be chainable when passed an object", function(){
-            expect(ScrollAnimate.options({loop: false})).toBe(ScrollAnimate);
+            expect(ScrollAnimate.options({ smoothScroll: { enabled: true } })).toBe(ScrollAnimate);
         });
     });
 
@@ -53,7 +52,7 @@ describe("ScrollAnimate", function() {
 
         it('should take options and save them', function() {
             var expected = true;
-            expect(ScrollAnimate.run({loop: expected}).options().loop).toBe(expected);
+            expect(ScrollAnimate.run({ smoothScroll: { enabled: expected } }).options().smoothScroll.enabled).toBe(expected);
         });
     });
 
@@ -190,17 +189,21 @@ describe("ScrollAnimate", function() {
         });
     });
 
-    describe("ScrollAnimate.options.loop", function(){
-        it('should be a boolean', function(){
-            expect(typeof ScrollAnimate.options().loop).toBe('boolean');
-        });
-    });
-
     describe("ScrollAnimate.options.smoothScroll", function(){
         it('should be a an object with two options', function(){
             expect(typeof ScrollAnimate.options().smoothScroll).toBe('object');
             expect(typeof ScrollAnimate.options().smoothScroll.enabled).toBe('boolean');
             expect(typeof ScrollAnimate.options().smoothScroll.speed).toBe('number');
+        });
+    });
+
+    describe("ScrollAnimate.update", function() {
+        it("should be a function", function() {
+            expect(typeof ScrollAnimate.update).toBe('function');
+            spyOn(ScrollAnimate, 'update');
+            ScrollAnimate.update();
+            expect(ScrollAnimate.update).toHaveBeenCalled();
+
         });
     });
 
