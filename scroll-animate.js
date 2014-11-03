@@ -153,6 +153,7 @@
     eventsInitialized = true;
     return this;
   };
+
   /**
    * Stop all event listeners
    */
@@ -168,6 +169,7 @@
     eventsInitialized = false;
     return this;
   };
+
   /**
    * Array of elements to animate
    *
@@ -183,6 +185,7 @@
   ScrollAnimate._getItems = function() {
     return items;
   };
+
   /**
    * Scroller starts paused until either 'run' or 'play' is called
    *
@@ -198,6 +201,7 @@
 
     return this;
   };
+
   /**
    * Causes the loop to start and begin updating again
    */
@@ -206,6 +210,7 @@
 
     return this;
   };
+
   /**
    * Toggle running state
    */
@@ -214,6 +219,7 @@
 
     return this;
   };
+
   /**
    * Either sets the running state or gets it
    *
@@ -228,6 +234,7 @@
       return !paused;
     }
   };
+
   /**
    * Keep track of the last time scroll event was trigger
    *
@@ -244,6 +251,7 @@
       window.requestAnimationFrame(loop);
     }
   };
+
   /**
    * Is the mouse wheel moving?
    *
@@ -329,6 +337,7 @@
     // Chaining
     return this;
   };
+
   /**
    * Don't rerender if don't have to
    *
@@ -358,6 +367,7 @@
   var getScrollTop = ScrollAnimate.getScrollTop = function() {
     return (window.pageYOffset || doc.scrollTop) - (doc.clientTop || 0);
   };
+
   /**
    * Track if the loop has already been started
    *
@@ -475,13 +485,15 @@
 
     // Apply css one time per loop per item
     for (i in targets) {
-      targets[i].$el.css(targets[i].css);
+      if (targets.hasOwnProperty(i)) {
+        targets[i].$el.css(targets[i].css);
+      }
     }
   }
 
   /*--------------------------------------------------------------------------
-    | Easing Functions
-    */
+   | Easing Functions
+   */
 
   /**
    * Make it public so anyone can add their own
