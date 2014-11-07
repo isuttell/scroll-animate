@@ -4,6 +4,7 @@ Animates elements by scroll position. Currently requires jQuery. Supports AMD.
 
 [![Build Status](https://travis-ci.org/isuttell/scroll-animate.svg)](https://travis-ci.org/isuttell/scroll-animate)
 [![Coverage Status](https://img.shields.io/coveralls/isuttell/scroll-animate.svg)](https://coveralls.io/r/isuttell/scroll-animate)
+[![GitHub version](https://badge.fury.io/gh/isuttell%2Fscroll-animate.svg)](http://badge.fury.io/gh/isuttell%2Fscroll-animate)
 
 ### Basics
 
