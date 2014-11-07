@@ -18,7 +18,9 @@
     "tests",
     ".gitignore",
     ".jshintrc",
+    ".jscsrc",
     ".travis.yml",
+    ".coveralls.yml",
     "Gruntfile.js",
     "package.json"
   ]
