@@ -104,20 +104,6 @@ module.exports = function (grunt)
                     logLevel: 'INFO'
                 }
             }
-        },
-        bump:
-        {
-            options:
-            {
-                files: ['package.json', 'bower.json'],
-                commit: true,
-                commitMessage: 'Release v%VERSION%',
-                createTag: true,
-                tagName: '%VERSION%',
-                tagMessage: 'Version %VERSION%',
-                pushTo: 'origin',
-                push: true
-            }
         }
     });
 
@@ -128,8 +114,8 @@ module.exports = function (grunt)
 	|
 	*/
 
-    grunt.registerTask('lint', ['jshint', 'jsvalidate']);
-    grunt.registerTask('test', ['karma:build', 'lint', 'jscs']);
+    grunt.registerTask('lint', ['jscs', 'jshint', 'jsvalidate']);
+    grunt.registerTask('test', ['karma:build', 'lint']);
 
     grunt.registerTask('build', ['test', 'uglify']);
     grunt.registerTask('default', ['karma:watch:start', 'watch']);
