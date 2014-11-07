@@ -90,7 +90,7 @@
    *
    * @type    {String}
    */
-  ScrollAnimate.VERSION = '0.3.0';
+  ScrollAnimate.VERSION = '0.3.2';
 
   /**
    * Update options or return current settings
@@ -310,7 +310,7 @@
   /**
    * Adds a property to animate
    *
-   * @param    {[type]}    options    [description]
+   * @param    {Object}    options    config
    */
   ScrollAnimate.add = function(options) {
     options = extend(options, itemDefaults);
@@ -385,9 +385,7 @@
    */
   function loop() {
     loopStarted = true;
-    /*--------------------------------------------------------------------------
-        | Update item Properties
-        */
+    // Update item Properties
     var scrollTop = getScrollTop();
 
     // Only update styles when the scroll top has changed
@@ -396,9 +394,7 @@
     }
     lastScrollTop = scrollTop;
 
-    /*--------------------------------------------------------------------------
-        | Manually Scroll for smoother scrolling - Scroll Jack
-        */
+    // Manually Scroll for smoother scrolling - Scroll Jack
     if (true === options.smoothScroll.enabled && true === mouseWheelActive) {
       window.scrollBy(0, -mouseDelta * options.smoothScroll.speed);
       scrollCount++;
