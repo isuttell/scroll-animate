@@ -7,6 +7,7 @@
 
 (function(root, factory) {
   'use strict';
+  /* istanbul ignore next */
   if (typeof define === 'function' && typeof define.amd === 'object') {
     define(['jquery', 'exports'], function($, exports) {
       return factory(root, exports, $);
@@ -22,12 +23,14 @@
    */
 
   var vendors = ['ms', 'moz', 'webkit', 'o'];
+  /* istanbul ignore next */
   for (var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
     window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
     window.cancelAnimationFrame = window[vendors[x] + 'CancelAnimationFrame'] ||
       window[vendors[x] + 'CancelRequestAnimationFrame'];
   }
 
+    /* istanbul ignore next */
   if (!window.requestAnimationFrame) {
     var lastFrameTime = 0;
     window.requestAnimationFrame = function(callback) {
@@ -42,6 +45,7 @@
     };
   }
 
+  /* istanbul ignore next */
   if (!window.cancelAnimationFrame) {
     window.cancelAnimationFrame = function(id) {
       clearTimeout(id);
@@ -96,7 +100,7 @@
    * @return    {Object}
    */
   ScrollAnimate.options = function(settings) {
-    if (typeof settings === 'object') {
+    if (isObject(settings)) {
       options = extend(settings, options);
       return this;
     } else {
@@ -123,12 +127,6 @@
     return this;
   };
 
-  /**
-   * Manually trigger an update
-   */
-  ScrollAnimate.update = function() {
-    update();
-  };
   /**
    * Interal check to see if events are connected;
    *
@@ -324,11 +322,11 @@
         }
       }
 
-      if (typeof options.tween === 'function') {
+      if (isFunction(options.tween)) {
         options.tween = options.tween(options.$el).pause();
       }
 
-      if (typeof options.ease !== 'string' || typeof Ease[options.ease] !== 'function') {
+      if (!isString(options.ease) || !isFunction(Ease[options.ease])) {
         options.ease = 'Linear';
       }
 
@@ -419,30 +417,30 @@
   /**
    * Update each element according to scroll top
    */
-  function update() {
+  var update = ScrollAnimate.update = function() {
     var targets = [];
     var i;
-    var scrollTop = getScrollTop();
+    var scrollTop = ScrollAnimate.getScrollTop();
 
     for (i = 0; i < items.length; i++) {
       // start and stop
       var start = items[i].scroll.start;
       var stop = items[i].scroll.stop;
-      if (typeof start === 'function') {
-        start = start(items[i].$el);
+      if (isFunction(start)) {
+        start = start.call(items[i], items[i].$el);
       }
-      if (typeof stop === 'function') {
-        stop = stop(items[i].$el);
+      if (isFunction(stop)) {
+        stop = stop.call(items[i], items[i].$el);
       }
 
       // values
       var startVal = items[i].values.start;
       var stopVal = items[i].values.stop;
-      if (typeof startVal === 'function') {
-        startVal = startVal(items[i].$el);
+      if (isFunction(startVal)) {
+        startVal = startVal.call(items[i], items[i].$el);
       }
-      if (typeof stopVal === 'function') {
-        stopVal = stopVal(items[i].$el);
+      if (isFunction(stopVal)) {
+        stopVal = stopVal.call(items[i], items[i].$el);
       }
 
       // Calculate what the value should be based on current scroll position
@@ -452,7 +450,7 @@
       items[i]._currentValue = Ease[items[i].ease](percent, startVal, adjustedMax, 1);
 
       // Assign Value
-      if (typeof items[i].tween === 'object' && typeof items[i].tween.progress === 'function') {
+      if (isObject(items[i].tween) && isFunction(items[i].tween.progress)) {
         // Greensock TweenMax Support
         items[i].tween.progress(percent);
       } else if (items[i].property === 'transform') {
@@ -489,7 +487,87 @@
         targets[i].$el.css(targets[i].css);
       }
     }
-  }
+  };
+
+  /**
+   * Expose utility functions for testing
+   *
+   * @type    {Object}
+   */
+  ScrollAnimate._util = {};
+
+  /**
+   * Calculates where in the scroll we should be
+   *
+   * @param     {Number}    scrollTop    the position of the scroll
+   * @param     {Object}    start        start value
+   * @param     {Number}    stop         stop value
+   *
+   * @return    {Number}                 should be between 0 and 1
+   */
+  var tweenPosition = ScrollAnimate._util.tweenPosition = function(scrollTop, start, stop) {
+    var value = scrollTop - start;
+    var adjustedMax = stop - start;
+    if (value < 0) {
+      return 0;
+    } else if (value > adjustedMax) {
+      return 1;
+    } else {
+      return value / adjustedMax;
+    }
+  };
+
+  /**
+   * Basic Recursive Extend Function
+   *
+   * @param     {Object}    src     input
+   * @param     {Object}    dest    defaults
+   *
+   * @return    {Object}
+   */
+  var extend = ScrollAnimate._util.extend = function(src, dest) {
+    for (var i in dest) {
+      if (isObject(dest[i])) {
+        src[i] = extend(src[i] || {}, dest[i]);
+      } else if (typeof src[i] === 'undefined') {
+        src[i] = dest[i];
+      }
+    }
+    return src;
+  };
+
+  /**
+   * Checks to see if var is a function
+   *
+   * @param     {Function}    fn    Function to test
+   *
+   * @return    {Boolean}
+   */
+  var isFunction = ScrollAnimate._util.isFunction = function(fn) {
+    return {}.toString.call(fn) === '[object Function]';
+  };
+
+  /**
+   * Checks to see variable is an Object
+   *
+   * @param     {Mixed}    obj    Object to test
+   *
+   * @return    {Boolean}
+   */
+  var isObject = ScrollAnimate._util.isObject = function(obj) {
+    return {}.toString.call(obj) === '[object Object]';
+  };
+
+  /**
+   * Checks to see variable is an String
+   *
+   * @param     {Mixed}    str    String to test
+   *
+   * @return    {Boolean}
+   */
+  var isString = ScrollAnimate._util.isString = function(str) {
+    return {}.toString.call(str) === '[object String]';
+  };
 
   /*--------------------------------------------------------------------------
    | Easing Functions
@@ -957,47 +1035,6 @@
     }
     return Ease.BounceOut(percent * 2 - 1, 0, change) * 0.5 + change * 0.5 + initial;
   };
-
-  /**
-   * Calculates where in the scroll we should be
-   *
-   * @param     {Number}    scrollTop    the position of the scroll
-   * @param     {Object}    start        start value
-   * @param     {Number}    stop         stop value
-   *
-   * @return    {Number}                 should be between 0 and 1
-   */
-  function tweenPosition(scrollTop, start, stop) {
-
-    var value = scrollTop - start;
-    var adjustedMax = stop - start;
-    if (value < 0) {
-      return 0;
-    } else if (value > adjustedMax) {
-      return 1;
-    } else {
-      return value / adjustedMax;
-    }
-  }
-
-  /**
-   * Basic Recursive Extend Function
-   *
-   * @param     {Object}    src     input
-   * @param     {Object}    dest    defaults
-   *
-   * @return    {Object}
-   */
-  function extend(src, dest) {
-    for (var i in dest) {
-      if (typeof dest[i] === 'object') {
-        src[i] = extend(src[i] || {}, dest[i]);
-      } else if (typeof src[i] === 'undefined') {
-        src[i] = dest[i];
-      }
-    }
-    return src;
-  }
 
   return ScrollAnimate;
 });

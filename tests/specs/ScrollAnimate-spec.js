@@ -1,8 +1,16 @@
 describe("ScrollAnimate", function() {
 
     beforeEach(function(){
+        ScrollAnimate.options({
+            smoothScroll: {
+                enabled: false,
+                speed: 15
+            }
+        });
         ScrollAnimate.clear();
     });
+
+
 
     it("should be defined", function() {
         expect(ScrollAnimate).toBeDefined();
@@ -53,6 +61,170 @@ describe("ScrollAnimate", function() {
         it('should take options and save them', function() {
             var expected = true;
             expect(ScrollAnimate.run({ smoothScroll: { enabled: expected } }).options().smoothScroll.enabled).toBe(expected);
+        });
+    });
+
+    describe("ScrollAnimate.update", function() {
+        it("should be a function", function() {
+            spyOn(ScrollAnimate, 'update');
+            expect(typeof ScrollAnimate.update).toBe('function');
+            ScrollAnimate.update();
+            expect(ScrollAnimate.update).toHaveBeenCalled();
+        });
+
+        it('should update an item\'s current value', function() {
+            var item = {
+                    $el : $('<div></div>'),
+                    // scrollTop positions to track. values can be either a number or a function
+                    scroll: {
+                        start: 0,
+                        stop: 100
+                    },
+                    // Values to tween, these can also either be a function or number
+                    values: {
+                        start: 0,
+                        stop: 100
+                    },
+                    ease: 'ExpoInOut',
+                    property: 'transform',
+                    transform: 'translateX(%s%)' // %s is replaced with the current value
+                };
+            ScrollAnimate.add(item).update();
+            expect(ScrollAnimate._getItems()[0]._currentValue).toBe(0);
+        });
+
+        it('should update an take Numbers for scroll/values start/stop', function() {
+            var item = {
+                    $el : $('<div></div>'),
+                    // scrollTop positions to track. values can be either a number or a function
+                    scroll: {
+                        start: 0,
+                        stop: 100
+                    },
+                    // Values to tween, these can also either be a function or number
+                    values: {
+                        start: 100,
+                        stop: 0
+                    },
+                    ease: 'ExpoInOut',
+                    property: 'transform',
+                    transform: 'translateX(%s%)' // %s is replaced with the current value
+                };
+            ScrollAnimate.add(item).update();
+            expect(ScrollAnimate._getItems()[0]._currentValue).toBe(100);
+        });
+
+        it('should update an take Functions for scroll/values start/stop', function() {
+            var item = {
+                    $el : $('<div></div>'),
+                    // scrollTop positions to track. values can be either a number or a function
+                    scroll: {
+                        start: function(){ return 0; },
+                        stop: function(){ return 100; }
+                    },
+                    // Values to tween, these can also either be a function or number
+                    values: {
+                        start: function(){ return 50; },
+                        stop: function(){ return 0; },
+                    },
+                    property: 'transform',
+                    transform: 'translateX(%s%)' // %s is replaced with the current value
+                };
+            ScrollAnimate.add(item).update();
+            expect(ScrollAnimate._getItems()[0]._currentValue).toBe(50);
+        });
+
+        it('should apply the item context to each scroll/value function', function() {
+            var contexts = [];
+            var item = {
+                $el : $('<div></div>'),
+                // scrollTop positions to track. values can be either a number or a function
+                scroll: {
+                    start: function(){ contexts.push(this); return 0; },
+                    stop: function(){ contexts.push(this); return 100; }
+                },
+                // Values to tween, these can also either be a function or number
+                values: {
+                    start: function(){ contexts.push(this); return 50; },
+                    stop: function(){ contexts.push(this); return 0; }
+                },
+                property: 'transform',
+                transform: 'translateX(%s%)' // %s is replaced with the current value
+            };
+            ScrollAnimate.add(item).update();
+            for(var i = 0; i < contexts.length; i++){
+                expect(contexts[i]).toBe(ScrollAnimate._getItems()[0]);
+            }
+        });
+
+        it('should supply the $el argument to each scroll/value function', function() {
+            var typeofs = [];
+            var item = {
+                $el : $('<div></div>'),
+                // scrollTop positions to track. values can be either a number or a function
+                scroll: {
+                    start: function($el){ typeofs.push(typeof $el); return 0; },
+                    stop: function($el){ typeofs.push(typeof $el); return 100; }
+                },
+                // Values to tween, these can also either be a function or number
+                values: {
+                    start: function($el){ typeofs.push(typeof $el); return 50; },
+                    stop: function($el){ typeofs.push(typeof $el); return 0; }
+                },
+                property: 'transform',
+                transform: 'translateX(%s%)' // %s is replaced with the current value
+            };
+            ScrollAnimate.add(item).update();
+            for(var i = 0; i < typeofs.length; i++){
+                expect(typeofs[i]).not.toBe('undefined');
+            }
+        });
+
+        it('should update a property on an element', function() {
+            var $element = $('<div></div>');
+            var item = {
+                $el : $element,
+                // scrollTop positions to track. values can be either a number or a function
+                scroll: {
+                    start: 0,
+                    stop: 100
+                },
+                // Values to tween, these can also either be a function or number
+                values: {
+                    start: 0,
+                    stop: 1
+                },
+                property: 'opacity',
+            };
+            spyOn(ScrollAnimate, 'getScrollTop').andReturn(100);
+            ScrollAnimate.add(item).update();
+            expect($element.css('opacity')).toBe('1');
+        });
+
+        it('should update a property on an element', function() {
+            ScrollAnimate.options({
+                smoothScroll: {
+                    enabled: true
+                }
+            });
+            var $element = $('<div></div>');
+            var item = {
+                $el : $element,
+                // scrollTop positions to track. values can be either a number or a function
+                scroll: {
+                    start: 0,
+                    stop: 100
+                },
+                // Values to tween, these can also either be a function or number
+                values: {
+                    start: 0,
+                    stop: 1
+                },
+                property: 'opacity',
+            };
+            spyOn(ScrollAnimate, 'getScrollTop').andReturn(100);
+            ScrollAnimate.add(item).update();
+            expect($element.css('opacity')).toBe('1');
         });
     });
 
@@ -197,16 +369,6 @@ describe("ScrollAnimate", function() {
         });
     });
 
-    describe("ScrollAnimate.update", function() {
-        it("should be a function", function() {
-            expect(typeof ScrollAnimate.update).toBe('function');
-            spyOn(ScrollAnimate, 'update');
-            ScrollAnimate.update();
-            expect(ScrollAnimate.update).toHaveBeenCalled();
-
-        });
-    });
-
     xdescribe("ScrollAnimate animate", function() {
         beforeEach(function(){
 
@@ -217,4 +379,5 @@ describe("ScrollAnimate", function() {
         spyOn($.fn, 'scrollTop').andReturn(100);
         expect($(document).scrollTop()).toBe(100);
     });
+
 });
