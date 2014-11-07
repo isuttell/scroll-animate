@@ -9,7 +9,7 @@
   'use strict';
   if (typeof define === 'function' && typeof define.amd === 'object') {
     define(['jquery', 'exports'], function($, exports) {
-      root.ScrollAnimate = factory(root, exports, $);
+      return factory(root, exports, $);
     });
   } else {
     root.ScrollAnimate = factory(root, {}, root.jQuery);
