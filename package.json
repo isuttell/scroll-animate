@@ -13,6 +13,7 @@
   "author": "Isaac Suttell <isaac@isaacsuttell.com>",
   "readmeFilename": "README.md",
   "devDependencies": {
+    "coveralls": "^2.11.2",
     "grunt": "~0.4.5",
     "grunt-bump": "0.0.15",
     "grunt-cli": "~0.1.13",
