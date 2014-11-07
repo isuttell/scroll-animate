@@ -412,6 +412,9 @@
 
   /**
    * Update each element according to scroll top
+   *
+   * TODO
+   *  - Reduce cyclomatic complexity
    */
   var update = ScrollAnimate.update = function() {
     var targets = [];
@@ -819,7 +822,7 @@
    * @return    {Number}
    */
   Ease.ExpoOut = function(percent, initial, change) {
-    return (percent == 1) ? initial + change : change * (-Math.pow(2, -10 * percent / 1) + 1) + initial;
+    return (percent === 1) ? initial + change : change * (-Math.pow(2, -10 * percent / 1) + 1) + initial;
   };
 
   /**
@@ -835,7 +838,7 @@
     if (percent === 0) {
       return initial;
     }
-    if (percent == 1) {
+    if (percent === 1) {
       return initial + change;
     }
     if ((percent /= 1 / 2) < 1) {
@@ -964,7 +967,7 @@
     if (percent === 0) {
       return initial;
     }
-    if ((percent /= 1 / 2) == 2) {
+    if ((percent /= 1 / 2) === 2) {
       return initial + change;
     }
     if (!p) {
