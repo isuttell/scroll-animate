@@ -369,15 +369,21 @@ describe("ScrollAnimate", function() {
         });
     });
 
-    xdescribe("ScrollAnimate animate", function() {
-        beforeEach(function(){
-
-            ScrollAnimate.add({
-                $el: $('<div></div>')
+    describe('ScrollAnimate.mouseScroll', function() {
+        it('should normalize the mouse delta', function(){
+            var delta = ScrollAnimate._mouseScroll({
+                originalEvent: {
+                    wheelDelta : 120
+                }
             });
-        });
-        spyOn($.fn, 'scrollTop').andReturn(100);
-        expect($(document).scrollTop()).toBe(100);
-    });
+            expect(delta).toBe(1);
 
+            var delta2 = ScrollAnimate._mouseScroll({
+                originalEvent: {
+                    detail : -3
+                }
+            });
+            expect(delta2).toBe(1);
+        });
+    });
 });

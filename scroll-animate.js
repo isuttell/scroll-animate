@@ -371,11 +371,11 @@
   var mouseDelta = 0;
 
   /**
-   * Track Scroll wheel for smoother scrolling
+   * Track Scroll wheel for smoother scrolling. Expose to public for testing
    *
    * @param     {Object}    event    MouseEvent
    */
-  function mouseScroll(event) {
+  var mouseScroll = ScrollAnimate._mouseScroll = function(event) {
     mouseWheelActive = true;
 
     // cancel the default scroll behavior
@@ -389,7 +389,10 @@
     } else if (event.originalEvent.detail) {
       mouseDelta = -event.originalEvent.detail / 3;
     }
-  }
+
+    // Only used for testing purposes
+    return mouseDelta;
+  };
 
   /**
    * Clears the list of items to animate
