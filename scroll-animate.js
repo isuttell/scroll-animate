@@ -91,7 +91,7 @@
    *
    * @type    {String}
    */
-  ScrollAnimate.VERSION = '0.4.0';
+  ScrollAnimate.VERSION = '0.3.3';
 
   /**
    * Expose utility functions for testing
