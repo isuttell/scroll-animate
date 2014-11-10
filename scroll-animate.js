@@ -85,12 +85,111 @@
     },
     property: 'opacity'
   };
+
   /**
    * Plugin Version
    *
    * @type    {String}
    */
-  ScrollAnimate.VERSION = '0.3.2';
+  ScrollAnimate.VERSION = '0.4.0';
+
+  /**
+   * Expose utility functions for testing
+   *
+   * @type    {Object}
+   */
+  ScrollAnimate._util = {};
+
+  /**
+   * Calculates where in the scroll we should be
+   *
+   * @param     {Number}    scrollTop    the position of the scroll
+   * @param     {Object}    start        start value
+   * @param     {Number}    stop         stop value
+   *
+   * @return    {Number}                 should be between 0 and 1
+   */
+  var tweenPosition = ScrollAnimate._util.tweenPosition = function(scrollTop, start, stop) {
+    var value = scrollTop - start;
+    var adjustedMax = stop - start;
+    if (value < 0) {
+      return 0;
+    } else if (value > adjustedMax) {
+      return 1;
+    } else {
+      return value / adjustedMax;
+    }
+  };
+
+  /**
+   * Basic Recursive Extend Function
+   *
+   * @param     {Object}    src     input
+   * @param     {Object}    dest    defaults
+   *
+   * @return    {Object}
+   */
+  var extend = ScrollAnimate._util.extend = function(src, dest) {
+    for (var i in dest) {
+      if (isObject(dest[i])) {
+        src[i] = extend(src[i] || {}, dest[i]);
+      } else if (typeof src[i] === 'undefined') {
+        src[i] = dest[i];
+      }
+    }
+    return src;
+  };
+
+  /**
+   * Checks to see if var is a function
+   *
+   * @param     {Function}    fn    Function to test
+   *
+   * @return    {Boolean}
+   */
+  var isFunction = ScrollAnimate._util.isFunction = function(fn) {
+    return {}.toString.call(fn) === '[object Function]';
+  };
+
+  /**
+   * Checks to see variable is an Object
+   *
+   * @param     {Mixed}    obj    Object to test
+   *
+   * @return    {Boolean}
+   */
+  var isObject = ScrollAnimate._util.isObject = function(obj) {
+    return {}.toString.call(obj) === '[object Object]';
+  };
+
+  /**
+   * Checks to see variable is an String
+   *
+   * @param     {Mixed}    str    String to test
+   *
+   * @return    {Boolean}
+   */
+  var isString = ScrollAnimate._util.isString = function(str) {
+    return {}.toString.call(str) === '[object String]';
+  };
+
+  /**
+   * Gets a variable or calls a function depending on what it finds
+   *
+   * @param  {Object} object  Object to look in
+   * @param  {String} name    Object key to get
+   * @param  {Mixed}  context `this` context to Apply
+   * @param  {Mixed}  args    Additional arguments to pass to function context
+   *
+   * @return {Mixed}
+   */
+  var results = ScrollAnimate._util.results = function(object, name, context) {
+    if (isFunction(object[name])) {
+      var args =  Array.prototype.slice.call(arguments).slice(3);
+      return object[name].apply(context || ScrollAnimate, args);
+    }
+    return object[name];
+  };
 
   /**
    * Update options or return current settings
@@ -474,104 +573,6 @@
         targets[i].$el.css(targets[i].css);
       }
     }
-  };
-
-  /**
-   * Expose utility functions for testing
-   *
-   * @type    {Object}
-   */
-  ScrollAnimate._util = {};
-
-  /**
-   * Calculates where in the scroll we should be
-   *
-   * @param     {Number}    scrollTop    the position of the scroll
-   * @param     {Object}    start        start value
-   * @param     {Number}    stop         stop value
-   *
-   * @return    {Number}                 should be between 0 and 1
-   */
-  var tweenPosition = ScrollAnimate._util.tweenPosition = function(scrollTop, start, stop) {
-    var value = scrollTop - start;
-    var adjustedMax = stop - start;
-    if (value < 0) {
-      return 0;
-    } else if (value > adjustedMax) {
-      return 1;
-    } else {
-      return value / adjustedMax;
-    }
-  };
-
-  /**
-   * Basic Recursive Extend Function
-   *
-   * @param     {Object}    src     input
-   * @param     {Object}    dest    defaults
-   *
-   * @return    {Object}
-   */
-  var extend = ScrollAnimate._util.extend = function(src, dest) {
-    for (var i in dest) {
-      if (isObject(dest[i])) {
-        src[i] = extend(src[i] || {}, dest[i]);
-      } else if (typeof src[i] === 'undefined') {
-        src[i] = dest[i];
-      }
-    }
-    return src;
-  };
-
-  /**
-   * Checks to see if var is a function
-   *
-   * @param     {Function}    fn    Function to test
-   *
-   * @return    {Boolean}
-   */
-  var isFunction = ScrollAnimate._util.isFunction = function(fn) {
-    return {}.toString.call(fn) === '[object Function]';
-  };
-
-  /**
-   * Checks to see variable is an Object
-   *
-   * @param     {Mixed}    obj    Object to test
-   *
-   * @return    {Boolean}
-   */
-  var isObject = ScrollAnimate._util.isObject = function(obj) {
-    return {}.toString.call(obj) === '[object Object]';
-  };
-
-  /**
-   * Checks to see variable is an String
-   *
-   * @param     {Mixed}    str    String to test
-   *
-   * @return    {Boolean}
-   */
-  var isString = ScrollAnimate._util.isString = function(str) {
-    return {}.toString.call(str) === '[object String]';
-  };
-
-  /**
-   * Gets a variable or calls a function depending on what it finds
-   *
-   * @param  {Object} object  Object to look in
-   * @param  {String} name    Object key to get
-   * @param  {Mixed}  context `this` context to Apply
-   * @param  {Mixed}  args    Additional arguments to pass to function context
-   *
-   * @return {Mixed}
-   */
-  var results = ScrollAnimate._util.results = function(object, name, context) {
-    if (isFunction(object[name])) {
-      var args =  Array.prototype.slice.call(arguments).slice(3);
-      return object[name].apply(context || ScrollAnimate, args);
-    }
-    return object[name];
   };
 
   /*--------------------------------------------------------------------------
