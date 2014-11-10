@@ -30,7 +30,7 @@
       window[vendors[x] + 'CancelRequestAnimationFrame'];
   }
 
-    /* istanbul ignore next */
+  /* istanbul ignore next */
   if (!window.requestAnimationFrame) {
     var lastFrameTime = 0;
     window.requestAnimationFrame = function(callback) {
@@ -185,7 +185,7 @@
    */
   var results = ScrollAnimate._util.results = function(object, name, context) {
     if (isFunction(object[name])) {
-      var args =  Array.prototype.slice.call(arguments).slice(3);
+      var args = Array.prototype.slice.call(arguments).slice(3);
       return object[name].apply(context || ScrollAnimate, args);
     }
     return object[name];
@@ -416,26 +416,38 @@
    */
   ScrollAnimate.add = function(options) {
     options = extend(options, itemDefaults);
-    if (options.$el) {
-      options.id = 'el' + idCount++;
-      for (var i = 0; i < items.length; i++) {
-        if (options.$el.is(items[i].$el)) {
-          options.id = items[i].id;
-        }
-      }
 
-      if (isFunction(options.tween)) {
-        options.tween = options.tween(options.$el).pause();
-      }
+    options.id = uniqueId(options.$el);
 
-      if (!isString(options.ease) || !isFunction(Ease[options.ease])) {
-        options.ease = 'Linear';
-      }
-
-      items.push(options);
+    if (isFunction(options.tween)) {
+      options.tween = options.tween(options.$el).pause();
     }
+
+    if (!isString(options.ease) || !isFunction(Ease[options.ease])) {
+      options.ease = 'Linear';
+    }
+
+    items.push(options);
+
     // Chaining
     return this;
+  };
+
+  /**
+   * Get return a unique ID or get the id of an exisitng element
+   *
+   * @param  {Object} $el Object to search for
+   *
+   * @return {String}
+   */
+  var uniqueId = function($el) {
+    for (var i = 0; i < items.length; i++) {
+      if ($el.is(items[i].$el)) {
+        return items[i].id;
+      }
+    }
+
+    return 'el' + idCount++;
   };
 
   /**
@@ -513,10 +525,56 @@
   }
 
   /**
-   * Update each element according to scroll top
+   * Applys the CSS found in Targets
    *
-   * TODO
-   *  - Reduce cyclomatic complexity
+   * @param    {Array}   targets    An array of objects
+   *                                {
+   *                                  $el: {jQuery}
+   *                                  css: {jQuery CSS Object}
+   *                                }
+   */
+  var applyCSS = ScrollAnimate.applyCSS = function(targets) {
+    var i;
+    for (i in targets) {
+      if (targets.hasOwnProperty(i)) {
+        targets[i].$el.css(targets[i].css);
+      }
+    }
+  };
+
+  /**
+   * Creates or updates a object to apply CSS to an element.
+   * If an elementh as multiple properties to apply, they are only
+   * applied once to prevent excessive paint/composite changes
+   *
+   * @param  {Object} item   ScrollAnimate.item
+   * @param  {Object} target Contains the el and the css to apply
+   *
+   * @return {Object}
+   */
+  var getTargetCSS = ScrollAnimate.getTargetCSS = function(item, target) {
+    // Define empty target or use existing
+    target = target || {
+      $el: item.$el,
+      css: {}
+    };
+
+    if (item.property === 'transform') {
+      // Concat multiple transforms together
+      target.css.transform = target.css.transform || '';
+      target.css.transform += ' ' + item.transform.replace('%s', item._currentValue);
+    } else if (item.property === 'filter') {
+      // Apply Webkit filter
+      target.css['-webkit-filter'] = item.filter.replace('%s', item._currentValue);
+    } else {
+      // Save it to an object so we can apply multiply properties once
+      target.css[item.property] = item._currentValue;
+    }
+    return target;
+  };
+
+  /**
+   * Update each element according to scroll top
    */
   var update = ScrollAnimate.update = function() {
     var targets = [];
@@ -536,46 +594,26 @@
       var percent = tweenPosition(scrollTop, start, stop);
       var adjustedMax = stopVal - startVal;
 
+      // The Magic. Get the current value we need to apply to the el
       items[i]._currentValue = Ease[items[i].ease](percent, startVal, adjustedMax, 1);
 
       // Assign Value
       if (isObject(items[i].tween) && isFunction(items[i].tween.progress)) {
         // Greensock TweenMax Support
         items[i].tween.progress(percent);
-      } else if (items[i].property === 'transform') {
-        // Concat multiple transforms together
-        targets[items[i].id] = targets[items[i].id] || {
-          $el: items[i].$el,
-          css: {
-            transform: ''
-          }
-        };
-        targets[items[i].id].css.transform += ' ' + items[i].transform.replace('%s', items[i]._currentValue);
-      } else if (items[i].property === 'filter') {
-        // Concat multiple transforms together
-        targets[items[i].id] = targets[items[i].id] || {
-          $el: items[i].$el,
-          css: {}
-        };
-        targets[items[i].id].css['-webkit-filter'] = items[i].filter.replace('%s', items[i]._currentValue);
       } else if (items[i].property === 'scrollTop') {
+        // Apply scroll top
         items[i].$el.scrollTop(items[i]._currentValue);
       } else {
-        // Save it to an object so we can apply multiply properties once
-        targets[items[i].id] = targets[items[i].id] || {
-          $el: items[i].$el,
-          css: {}
-        };
-        targets[items[i].id].css[items[i].property] = items[i]._currentValue;
+        // CSS
+        targets[items[i].id] = getTargetCSS(items[i], targets[items[i].id]);
       }
     }
 
-    // Apply css one time per loop per item
-    for (i in targets) {
-      if (targets.hasOwnProperty(i)) {
-        targets[i].$el.css(targets[i].css);
-      }
-    }
+    /**
+     * Apply CSS to targets
+     */
+    applyCSS(targets);
   };
 
   /*--------------------------------------------------------------------------
