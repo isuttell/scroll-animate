@@ -45,4 +45,50 @@ describe("_util", function() {
             });
         });
     });
+
+    describe('results', function() {
+
+        var testObject, _this, args;
+
+        beforeEach(function(){
+            _this = void 0;
+            args = void 0;
+
+            testObject = {
+                str: 'str',
+                num: 100,
+                fn: function() {
+                    args = arguments;
+                    _this = this;
+                    return 50;
+                }
+            };
+        });
+
+
+        it('should return return a basic value from an object', function() {
+            expect(ScrollAnimate._util.results(testObject, 'str')).toBe(testObject.str);
+            expect(ScrollAnimate._util.results(testObject, 'num')).toBe(testObject.num);
+        });
+
+        it('should return `undefined` when a value isn\'t found', function(){
+            expect(typeof ScrollAnimate._util.results(testObject, 'undef')).toBe('undefined');
+        });
+
+        it('should return the result of a function', function (){
+            expect(ScrollAnimate._util.results(testObject, 'fn')).toBe(testObject.fn.call());
+        });
+
+        it('should apply `this` context', function() {
+            var testValue = 10;
+            ScrollAnimate._util.results(testObject, 'fn', { mockThis : testValue});
+            expect(_this.mockThis).toBe(testValue);
+        });
+
+        it('should apply additional args', function() {
+            var testValue = 25;
+            ScrollAnimate._util.results(testObject, 'fn', {}, testValue);
+            expect(args[0]).toBe(testValue);
+        });
+    });
 });

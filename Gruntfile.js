@@ -91,8 +91,7 @@ module.exports = function (grunt)
                 {
                     background: true,
                     browsers: ['PhantomJS'],
-                    logLevel: 'ERROR',
-                    reporters: ['dots', 'coverage']
+                    logLevel: 'DBEUG'
                 }
             },
             all:

@@ -423,24 +423,12 @@
 
     for (i = 0; i < items.length; i++) {
       // start and stop
-      var start = items[i].scroll.start;
-      var stop = items[i].scroll.stop;
-      if (isFunction(start)) {
-        start = start.call(items[i], items[i].$el);
-      }
-      if (isFunction(stop)) {
-        stop = stop.call(items[i], items[i].$el);
-      }
+      var start = results(items[i].scroll, 'start', items[i], items[i].$el);
+      var stop = results(items[i].scroll, 'stop', items[i], items[i].$el);
 
       // values
-      var startVal = items[i].values.start;
-      var stopVal = items[i].values.stop;
-      if (isFunction(startVal)) {
-        startVal = startVal.call(items[i], items[i].$el);
-      }
-      if (isFunction(stopVal)) {
-        stopVal = stopVal.call(items[i], items[i].$el);
-      }
+      var startVal = results(items[i].values, 'start', items[i], items[i].$el);
+      var stopVal = results(items[i].values, 'stop', items[i], items[i].$el);
 
       // Calculate what the value should be based on current scroll position
       var percent = tweenPosition(scrollTop, start, stop);
@@ -566,6 +554,24 @@
    */
   var isString = ScrollAnimate._util.isString = function(str) {
     return {}.toString.call(str) === '[object String]';
+  };
+
+  /**
+   * Gets a variable or calls a function depending on what it finds
+   *
+   * @param  {Object} object  Object to look in
+   * @param  {String} name    Object key to get
+   * @param  {Mixed}  context `this` context to Apply
+   * @param  {Mixed}  args    Additional arguments to pass to function context
+   *
+   * @return {Mixed}
+   */
+  var results = ScrollAnimate._util.results = function(object, name, context) {
+    if (isFunction(object[name])) {
+      var args =  Array.prototype.slice.call(arguments).slice(3);
+      return object[name].apply(context || ScrollAnimate, args);
+    }
+    return object[name];
   };
 
   /*--------------------------------------------------------------------------
