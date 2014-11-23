@@ -13,6 +13,7 @@
   "author": "Isaac Suttell <isaac@isaacsuttell.com>",
   "readmeFilename": "README.md",
   "devDependencies": {
+    "codeclimate-test-reporter": "0.0.4",
     "coveralls": "^2.11.2",
     "grunt-cli": "~0.1.13",
     "grunt-contrib-jshint": "~0.10.0",
