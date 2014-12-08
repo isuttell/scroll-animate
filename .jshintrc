@@ -1,15 +1,18 @@
 {
 	"camelcase" : true,
 	"newcap"    : true,
-	"strict"    : true,
+	"strict"    : false,
 	"trailing"  : true,
 	"browser"   : true,
 	"jquery"    : true,
 	"undef"     : true,
-	"unused"    : true,
+	"unused"    : false,
 	"quotmark"  : false,
 	"maxcomplexity": 6,
 	"globals"   : {
-		"define": false
+		"define": false,
+		"Ease" : true,
+		"Utilities": true,
+		"ScrollTween" : true
 	}
 }

@@ -7,10 +7,17 @@ module.exports = function(config)
 
         files: [
             'tests/vendor/**/*.js',
-            'scroll-animate.js',
-            'tests/helpers/**/*.js',
+            'src/lib/polyfills.js',
+            'src/utilities.js',
+            'src/ease.js',
+            'src/scroll-tween.js',
+            'src/scroll-animate.js',
             'tests/specs/**/*.js',
         ],
+
+        preprocessors: {
+          'src/*.js': ['coverage'],
+        },
 
         autoWatch: false,
 

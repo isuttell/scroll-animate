@@ -42,11 +42,13 @@
 		<div class="box box-2"></div>
 		<div class="box box-3"></div>
 	</div>
-	<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.1/jquery.js"></script>
-	<script src="http://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
+	<script src="../tests/vendor/jquery.js"></script>
+	<script src="../tests/vendor/lodash.js"></script>
 	<script src="../scroll-animate.js"></script>
 	<script>
-		ScrollAnimate
+   var scroll = new ScrollAnimate();
+
+		scroll
 		.add({
 			$el : $('.box-1'),
                 scroll: {
@@ -114,21 +116,14 @@
                 },
                 ease: 'CubicOut',
                 property: 'opacity',
-		})
-		.run({
-			loop: true,
-			smoothScroll: {
-				enabled: false,
-				speed: 15
-			}
 		});
 
 
 		$('#toggle').click(function(){
-			ScrollAnimate.toggle();
+			scroll.toggle();
 		});
 
-		console.log(ScrollAnimate);
+		console.log(scroll);
 
 	</script>
 </body>

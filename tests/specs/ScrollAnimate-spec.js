@@ -1,13 +1,9 @@
 describe("ScrollAnimate", function() {
-
+    var scroll;
     beforeEach(function(){
-        ScrollAnimate.options({
-            smoothScroll: {
-                enabled: false,
-                speed: 15
-            }
-        });
-        ScrollAnimate.clear();
+        scroll = void 0;
+        scroll = new ScrollAnimate({});
+        scroll.clear();
     });
 
 
@@ -16,60 +12,12 @@ describe("ScrollAnimate", function() {
         expect(ScrollAnimate).toBeDefined();
     });
 
-    describe("ScrollAnimate.options", function() {
-        var expectedDefaults;
-
-        beforeEach(function(){
-            expectedDefaults = {
-                smoothScroll: {
-                    enabled: false,
-                    speed: 15
-                }
-            };
-        });
-
-        it("should be a function", function() {
-            expect(typeof ScrollAnimate.options).toBe('function');
-        });
-
-        it("should return current options when no arguments are set", function() {
-            expect(typeof ScrollAnimate.options()).toBe('object');
-            expect(ScrollAnimate.options()).toEqual(expectedDefaults);
-        });
-
-        it("should update options when passed an 'object' as an argument", function(){
-            var actual = ScrollAnimate.options({ smoothScroll: { enabled: true } }),
-                expected = expectedDefaults;
-            expected.smoothScroll.enabled = true;
-            expect(ScrollAnimate.options()).toEqual(expected);
-        });
-
-        it("should be chainable when passed an object", function(){
-            expect(ScrollAnimate.options({ smoothScroll: { enabled: true } })).toBe(ScrollAnimate);
-        });
-    });
-
-    describe("ScrollAnimate.run", function() {
-        it("should be a function", function() {
-            expect(typeof ScrollAnimate.run).toBe('function');
-        });
-
-        it('should be chainable', function() {
-            expect(ScrollAnimate.run()).toBe(ScrollAnimate);
-        });
-
-        it('should take options and save them', function() {
-            var expected = true;
-            expect(ScrollAnimate.run({ smoothScroll: { enabled: expected } }).options().smoothScroll.enabled).toBe(expected);
-        });
-    });
-
     describe("ScrollAnimate.update", function() {
         it("should be a function", function() {
-            spyOn(ScrollAnimate, 'update');
-            expect(typeof ScrollAnimate.update).toBe('function');
-            ScrollAnimate.update();
-            expect(ScrollAnimate.update).toHaveBeenCalled();
+            spyOn(scroll, 'update');
+            expect(typeof scroll.update).toBe('function');
+            scroll.update();
+            expect(scroll.update).toHaveBeenCalled();
         });
 
         it('should update an item\'s current value', function() {
@@ -89,8 +37,8 @@ describe("ScrollAnimate", function() {
                     property: 'transform',
                     transform: 'translateX(%s%)' // %s is replaced with the current value
                 };
-            ScrollAnimate.add(item).update();
-            expect(ScrollAnimate._getItems()[0]._currentValue).toBe(0);
+            scroll.add(item).update();
+            expect(scroll.items[0].val).toBe(0);
         });
 
         it('should update an take Numbers for scroll/values start/stop', function() {
@@ -110,8 +58,8 @@ describe("ScrollAnimate", function() {
                     property: 'transform',
                     transform: 'translateX(%s%)' // %s is replaced with the current value
                 };
-            ScrollAnimate.add(item).update();
-            expect(ScrollAnimate._getItems()[0]._currentValue).toBe(100);
+            scroll.add(item).update();
+            expect(scroll.items[0].val).toBe(100);
         });
 
         it('should update an take Functions for scroll/values start/stop', function() {
@@ -130,8 +78,9 @@ describe("ScrollAnimate", function() {
                     property: 'transform',
                     transform: 'translateX(%s%)' // %s is replaced with the current value
                 };
-            ScrollAnimate.add(item).update();
-            expect(ScrollAnimate._getItems()[0]._currentValue).toBe(50);
+
+            scroll.add(item).update();
+            expect(scroll.items[0].val).toBe(50);
         });
 
         it('should apply the item context to each scroll/value function', function() {
@@ -151,9 +100,9 @@ describe("ScrollAnimate", function() {
                 property: 'transform',
                 transform: 'translateX(%s%)' // %s is replaced with the current value
             };
-            ScrollAnimate.add(item).update();
+            scroll.add(item).update();
             for(var i = 0; i < contexts.length; i++){
-                expect(contexts[i]).toBe(ScrollAnimate._getItems()[0]);
+                expect(contexts[i]).toBe(scroll.items[0]);
             }
         });
 
@@ -174,7 +123,7 @@ describe("ScrollAnimate", function() {
                 property: 'transform',
                 transform: 'translateX(%s%)' // %s is replaced with the current value
             };
-            ScrollAnimate.add(item).update();
+            scroll.add(item).update();
             for(var i = 0; i < typeofs.length; i++){
                 expect(typeofs[i]).not.toBe('undefined');
             }
@@ -196,17 +145,12 @@ describe("ScrollAnimate", function() {
                 },
                 property: 'opacity',
             };
-            spyOn(ScrollAnimate, 'getScrollTop').andReturn(100);
-            ScrollAnimate.add(item).update();
+            spyOn(scroll, 'scrollPosition').andReturn(100);
+            scroll.add(item).update();
             expect($element.css('opacity')).toBe('1');
         });
 
         it('should update a property on an element', function() {
-            ScrollAnimate.options({
-                smoothScroll: {
-                    enabled: true
-                }
-            });
             var $element = $('<div></div>');
             var item = {
                 $el : $element,
@@ -222,43 +166,47 @@ describe("ScrollAnimate", function() {
                 },
                 property: 'opacity',
             };
-            spyOn(ScrollAnimate, 'getScrollTop').andReturn(100);
-            ScrollAnimate.add(item).update();
+            spyOn(scroll, 'scrollPosition').andReturn(100);
+            scroll.add(item).update();
             expect($element.css('opacity')).toBe('1');
         });
     });
 
     describe("ScrollAnimate.add", function() {
         it("should be a function", function() {
-            expect(typeof ScrollAnimate.add).toBe('function');
+            expect(typeof scroll.add).toBe('function');
         });
 
         it('should be chainable', function() {
-            expect(ScrollAnimate.add({$el:$('<div></div>')})).toBe(ScrollAnimate);
+            expect(scroll.add({$el:$('<div></div>')})).toBe(scroll);
         });
 
         it("should be take the 'tween' option", function() {
-            ScrollAnimate.add({
+            scroll.add({
                 $el: $('<div></div>'),
                 tween: function($el) {
                     return new TimelineMax().to( $('<div></div>'), {opacity: 0}, 0);
                 }
             });
-            expect(ScrollAnimate._getItems()[0]).toBeDefined();
+            expect(scroll.items[0]).toBeDefined();
         });
 
         it('should assign an unique id to each item', function() {
-            var items = ScrollAnimate.add({$el:$('<div></div>')}).add({$el:$('<div></div>')})._getItems();
+            var items = scroll.add({$el:$('<div></div>')}).add({$el:$('<div></div>')}).items;
 
             expect(items[0].id).toBeDefined();
+            expect(items[1].id).toBeDefined();
+
             expect(items[0].id).not.toBe(items[1].id);
         });
 
         it('should assign the same id to the same item', function() {
-            var $item = $('<div></div>'),
-                items = ScrollAnimate.add({$el:$item}).add({$el:$item})._getItems();
+            var $item = $(document.createElement('div')),
+                items = scroll.add({$el:$item}).add({$el:$item}).items;
 
             expect(items[0].id).toBeDefined();
+            expect(items[1].id).toBeDefined();
+
             expect(items[0].id).toBe(items[1].id);
         });
 
@@ -266,102 +214,102 @@ describe("ScrollAnimate", function() {
 
     describe("ScrollAnimate.pause", function() {
         it("should be a function", function() {
-            expect(typeof ScrollAnimate.pause).toBe('function');
+            expect(typeof scroll.pause).toBe('function');
         });
 
         it("should set 'paused' tp true", function(){
-            ScrollAnimate.running(true);
-            ScrollAnimate.pause();
-            expect(ScrollAnimate.running()).toBe(false);
+            scroll.running(true);
+            scroll.pause();
+            expect(scroll.running()).toBe(false);
         });
 
         it('should be chainable', function() {
-            expect(ScrollAnimate.pause()).toBe(ScrollAnimate);
+            expect(scroll.pause()).toBe(scroll);
         });
     });
 
     describe("ScrollAnimate.play", function() {
         it("should be a function", function() {
-            expect(typeof ScrollAnimate.play).toBe('function');
+            expect(typeof scroll.play).toBe('function');
         });
 
         it("should set 'paused' to false", function(){
-            ScrollAnimate.running(false);
-            ScrollAnimate.play();
-            expect(ScrollAnimate.running()).toBe(true);
+            scroll.running(false);
+            scroll.play();
+            expect(scroll.running()).toBe(true);
         });
 
         it('should be chainable', function() {
-            expect(ScrollAnimate.pause()).toBe(ScrollAnimate);
+            expect(scroll.pause()).toBe(scroll);
         });
     });
 
     describe("ScrollAnimate.toggle", function() {
         it("should be a function", function() {
-            expect(typeof ScrollAnimate.toggle).toBe('function');
+            expect(typeof scroll.toggle).toBe('function');
         });
 
         it('should toggle the paused state', function(){
-            ScrollAnimate.running(false);
-            expect(ScrollAnimate.running()).toBe(false);
-            ScrollAnimate.toggle();
-            expect(ScrollAnimate.running()).toBe(true);
+            scroll.running(false);
+            expect(scroll.running()).toBe(false);
+            scroll.toggle();
+            expect(scroll.running()).toBe(true);
         });
     });
 
     describe("ScrollAnimate.running", function() {
         it("should be a function", function() {
-            expect(typeof ScrollAnimate.running).toBe('function');
+            expect(typeof scroll.running).toBe('function');
         });
 
         it("should return a boolean", function() {
-            expect(typeof ScrollAnimate.running()).toBe('boolean');
+            expect(typeof scroll.running()).toBe('boolean');
         });
 
         it("should be able to set the running set", function() {
-            ScrollAnimate.running(false);
-            expect(ScrollAnimate.running()).toBe(false);
-            ScrollAnimate.running(true);
-            expect(ScrollAnimate.running()).toBe(true);
+            scroll.running(false);
+            expect(scroll.running()).toBe(false);
+            scroll.running(true);
+            expect(scroll.running()).toBe(true);
         });
     });
 
     describe("ScrollAnimate.clear", function() {
         it("should be a function", function() {
-            expect(typeof ScrollAnimate.clear).toBe('function');
+            expect(typeof scroll.clear).toBe('function');
         });
 
         it('should remove all animations', function() {
-            ScrollAnimate.add({$el: $('<div></div>')}).clear();
-            expect(ScrollAnimate._getItems().length).toBe(0);
+            scroll.add({$el: $('<div></div>')}).clear();
+            expect(scroll.items.length).toBe(0);
         });
 
         it('should be chainable', function() {
-            expect(ScrollAnimate.clear()).toBe(ScrollAnimate);
+            expect(scroll.clear()).toBe(scroll);
         });
     });
 
-   describe("ScrollAnimate.addEventListeners", function() {
+   xdescribe("ScrollAnimate.addEventListeners", function() {
         it("should be a function", function() {
-            expect(typeof ScrollAnimate.addEventListeners).toBe('function');
+            expect(typeof scroll.addEventListeners).toBe('function');
         });
 
         it('should be chainable', function() {
-            expect(ScrollAnimate.addEventListeners()).toBe(ScrollAnimate);
+            expect(scroll.addEventListeners()).toBe(scroll);
         });
     });
 
-    describe("ScrollAnimate.removeEventListeners", function() {
+    xdescribe("ScrollAnimate.removeEventListeners", function() {
         it("should be a function", function() {
-            expect(typeof ScrollAnimate.removeEventListeners).toBe('function');
+            expect(typeof scroll.removeEventListeners).toBe('function');
         });
 
         it('should be chainable', function() {
-            expect(ScrollAnimate.removeEventListeners()).toBe(ScrollAnimate);
+            expect(scroll.removeEventListeners()).toBe(scroll);
         });
     });
 
-    describe("ScrollAnimate.options.smoothScroll", function(){
+    xdescribe("ScrollAnimate.options.smoothScroll", function(){
         it('should be a an object with two options', function(){
             expect(typeof ScrollAnimate.options().smoothScroll).toBe('object');
             expect(typeof ScrollAnimate.options().smoothScroll.enabled).toBe('boolean');
@@ -369,21 +317,15 @@ describe("ScrollAnimate", function() {
         });
     });
 
-    describe('ScrollAnimate.mouseScroll', function() {
-        it('should normalize the mouse delta', function(){
-            var delta = ScrollAnimate._mouseScroll({
-                originalEvent: {
-                    wheelDelta : 120
-                }
-            });
-            expect(delta).toBe(1);
+    describe('tweenPosition', function() {
+        it('should turn Numbers in between 0 and 1', function(){
+            expect(typeof Utilities.tweenPosition(0, 0, 100)).toBe('number');
+            expect(Utilities.tweenPosition(0, 0, 100)).toBe(0);
+            expect(Utilities.tweenPosition(100, 0, 100)).toBe(1);
 
-            var delta2 = ScrollAnimate._mouseScroll({
-                originalEvent: {
-                    detail : -3
-                }
-            });
-            expect(delta2).toBe(1);
+            expect(Utilities.tweenPosition(200, 0, 100)).toBe(1);
+            expect(Utilities.tweenPosition(0, 100, 200)).toBe(0);
         });
     });
+
 });

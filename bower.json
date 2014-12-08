@@ -1,7 +1,7 @@
 {
   "name": "scroll-animate",
   "main": "scroll-animate.js",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "homepage": "https://github.com/isuttell/scroll-animate",
   "authors": [
     "Isaac Suttell <isaac@e-mc2.com>"
@@ -22,6 +22,8 @@
     ".travis.yml",
     ".coveralls.yml",
     "Gruntfile.js",
-    "package.json"
+    "package.json",
+    "src/",
+    "lib/"
   ]
 }
