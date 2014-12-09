@@ -8,7 +8,9 @@
     "url": "https://github.com/isuttell/scroll-animate.git"
   },
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt test",
+    "coveralls" :"NODE_ENV=test grunt karma:single && cat ./tests/coverage/lcov/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
+    "codeclimate" :"NODE_ENV=test grunt karma:single && cat ./tests/coverage/lcov/lcov.info | CODECLIMATE_REPO_TOKEN=a6b7b2dc9bf0d40545a03607ae21e3ab3cc56fc518a7b6d82075cbd705197095 ./node_modules/codeclimate-test-reporter/bin/codeclimate.js"
   },
   "contributors": "Isaac Suttell <isaac@isaacsuttell.com>",
   "readmeFilename": "README.md",
