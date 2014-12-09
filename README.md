@@ -7,7 +7,14 @@ Animates elements by scroll position. Currently requires jQuery. Supports AMD.
 [![Codacy Badge](https://www.codacy.com/project/badge/e8b62ca02cf7498ab4d6142fc51b4249)](https://www.codacy.com/public/isuttell/scrollanimate)
 [![Bower version](https://img.shields.io/bower/v/scroll-animate.svg?&style=flat)](http://badge.fury.io/gh/isuttell%2Fscroll-animate)
 
-### Basic Usage
+## Bower
+scroll-animate is available through [Bower](http://bower.io/).
+
+```shell
+bower install scroll-animate --save
+```
+
+## Basic Usage
 
 ```js
 // Create a new instance
@@ -67,7 +74,7 @@ window.addEventListener('resize', function(){
 }, false);
 ````
 
-### Easing
+## Easing
 
 You can specify any of the follow easing function to the default `property` tweens:
 
