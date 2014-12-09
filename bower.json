@@ -23,7 +23,9 @@
     ".coveralls.yml",
     "Gruntfile.js",
     "package.json",
-    "src/",
-    "lib/"
+    "src",
+    "lib",
+    "tasks",
+    ".flowconfig"
   ]
 }
