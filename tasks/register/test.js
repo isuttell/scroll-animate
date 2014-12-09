@@ -9,6 +9,8 @@
 module.exports = function(grunt) {
   grunt.registerTask('test', [
     'karma:single',
-    'hint'
+    'jshint:src',
+    'flow:src',
+    'jscs:src'
   ]);
 };
