@@ -184,7 +184,6 @@ ScrollAnimate.prototype.loop = function() {
  *                                }
  */
 ScrollAnimate.prototype.applyCSS = function(targets) {
-  targets = targets || this.targets;
   var i;
   for (i in targets) {
     if (targets.hasOwnProperty(i)) {
@@ -213,14 +212,16 @@ ScrollAnimate.prototype.update = function() {
     item.update(position);
 
     // Assign the Values
-    if (Utilities.isObject(item.options.tween) && Utilities.isFunction(item.options.tween.progress)) {
+    if (Utilities.isObject(item.tween)) {
       // Greensock TweenMax Support
-      item.options.tween.progress(item.percent);
+      item.tween.progress(item.percent);
     } else if (item.options.property === 'scrollTop') {
       // Apply scroll top
       item.$el.scrollTop(item.val);
     } else {
       // CSS
+      // We store an object array of css to apply so we only apply it once
+      // event if there are multiple tweens per $el
       targets[item.id] = item.pushCSS(targets[item.id]);
     }
 
@@ -240,10 +241,3 @@ ScrollAnimate.prototype.update = function() {
  * @type    {Object}
  */
 ScrollAnimate.prototype.Ease = Ease;
-
-/**
- * Make the Ease functions available
- *
- * @type    {Object}
- */
-ScrollAnimate.prototype.Utilities = Utilities;

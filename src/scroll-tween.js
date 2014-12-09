@@ -14,7 +14,7 @@
 function ScrollTween(id, options, parent) {
   options = Utilities.shallowClone(options || {});
   this.options = Utilities.assign(options, this.options);
-
+  this.id = id;
   this.parent = parent;
 
   this.$el = this.options.$el;
@@ -32,8 +32,6 @@ function ScrollTween(id, options, parent) {
 
   // Set Starting
   this.update(0);
-
-  this.id = id;
 }
 
 /**

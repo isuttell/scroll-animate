@@ -590,6 +590,20 @@ Ease.CircInOut = function(percent, initial, change) {
   return change / 2 * (Math.sqrt(1 - (percent -= 2) * percent) + 1) + initial;
 };
 
+// DRY
+function elasticHelper(a, s, p, change) {
+  if (a < Math.abs(change)) {
+    a = change;
+    s = p / 4;
+  } else {
+    s = p / PI2 * Math.asin(change / a);
+  }
+  return {
+    a:a,
+    s:s
+  };
+}
+
 /**
  * ElasticIn Ease
  *
@@ -612,13 +626,8 @@ Ease.ElasticIn = function(percent, initial, change) {
   if (!p) {
     p = 1 * 0.3;
   }
-  if (a < Math.abs(change)) {
-    a = change;
-    s = p / 4;
-  } else {
-    s = p / PI2 * Math.asin(change / a);
-  }
-  return -(a * Math.pow(2, 10 * (percent -= 1)) * Math.sin((percent * 1 - s) * PI2 / p)) + initial;
+  var h = elasticHelper(a, s, p, change);
+  return -(h.a * Math.pow(2, 10 * (percent -= 1)) * Math.sin((percent * 1 - h.s) * PI2 / p)) + initial;
 };
 
 /**
@@ -643,13 +652,8 @@ Ease.ElasticOut = function(percent, initial, change) {
   if (!p) {
     p = 1 * 0.3;
   }
-  if (a < Math.abs(change)) {
-    a = change;
-    s = p / 4;
-  } else {
-    s = p / PI2 * Math.asin(change / a);
-  }
-  return a * Math.pow(2, -10 * percent) * Math.sin((percent * 1 - s) * PI2 / p) + change + initial;
+  var h = elasticHelper(a, s, p, change);
+  return h.a * Math.pow(2, -10 * percent) * Math.sin((percent * 1 - h.s) * PI2 / p) + change + initial;
 };
 
 /**
@@ -674,16 +678,11 @@ Ease.ElasticInOut = function(percent, initial, change) {
   if (!p) {
     p = 1 * (0.3 * 1.5);
   }
-  if (a < Math.abs(change)) {
-    a = change;
-    s = p / 4;
-  } else {
-    s = p / PI2 * Math.asin(change / a);
-  }
+  var h = elasticHelper(a, s, p, change);
   if (percent < 1) {
-    return -0.5 * (a * Math.pow(2, 10 * (percent -= 1)) * Math.sin((percent * 1 - s) * PI2 / p)) + initial;
+    return -0.5 * (h.a * Math.pow(2, 10 * (percent -= 1)) * Math.sin((percent * 1 - h.s) * PI2 / p)) + initial;
   }
-  return a * Math.pow(2, -10 * (percent -= 1)) * Math.sin((percent * 1 - s) * PI2 / p) * 0.5 + change + initial;
+  return h.a * Math.pow(2, -10 * (percent -= 1)) * Math.sin((percent * 1 - h.s) * PI2 / p) * 0.5 + change + initial;
 };
 
 /**
@@ -751,7 +750,7 @@ Ease.BounceInOut = function(percent, initial, change) {
 function ScrollTween(id, options, parent) {
   options = Utilities.shallowClone(options || {});
   this.options = Utilities.assign(options, this.options);
-
+  this.id = id;
   this.parent = parent;
 
   this.$el = this.options.$el;
@@ -769,8 +768,6 @@ function ScrollTween(id, options, parent) {
 
   // Set Starting
   this.update(0);
-
-  this.id = id;
 }
 
 /**
@@ -1029,7 +1026,6 @@ ScrollAnimate.prototype.loop = function() {
  *                                }
  */
 ScrollAnimate.prototype.applyCSS = function(targets) {
-  targets = targets || this.targets;
   var i;
   for (i in targets) {
     if (targets.hasOwnProperty(i)) {
@@ -1058,14 +1054,16 @@ ScrollAnimate.prototype.update = function() {
     item.update(position);
 
     // Assign the Values
-    if (Utilities.isObject(item.options.tween) && Utilities.isFunction(item.options.tween.progress)) {
+    if (Utilities.isObject(item.tween)) {
       // Greensock TweenMax Support
-      item.options.tween.progress(item.percent);
+      item.tween.progress(item.percent);
     } else if (item.options.property === 'scrollTop') {
       // Apply scroll top
       item.$el.scrollTop(item.val);
     } else {
       // CSS
+      // We store an object array of css to apply so we only apply it once
+      // event if there are multiple tweens per $el
       targets[item.id] = item.pushCSS(targets[item.id]);
     }
 
@@ -1085,12 +1083,5 @@ ScrollAnimate.prototype.update = function() {
  * @type    {Object}
  */
 ScrollAnimate.prototype.Ease = Ease;
-
-/**
- * Make the Ease functions available
- *
- * @type    {Object}
- */
-ScrollAnimate.prototype.Utilities = Utilities;
   return ScrollAnimate;
 });

@@ -2,7 +2,7 @@ describe("ScrollAnimate", function() {
     var scroll;
     beforeEach(function(){
         scroll = void 0;
-        scroll = new ScrollAnimate({});
+        scroll = new ScrollAnimate();
         scroll.clear();
     });
 
@@ -236,7 +236,7 @@ describe("ScrollAnimate", function() {
                     return new TimelineMax().to( $('<div></div>'), {opacity: 0}, 0);
                 }
             });
-            scroll.update(0);
+            scroll.update();
             expect(scroll.items[0]).toBeDefined();
         });
 
@@ -257,6 +257,26 @@ describe("ScrollAnimate", function() {
             });
             scroll.update(0);
             expect(scroll.items[0]).toBeDefined();
+        });
+
+        it("should be take the 'scrollTop' option", function() {
+            var $el = $('<div></div>');
+            scroll.add({
+                $el: $el,
+                scroll: {
+                    start: 0,
+                    stop: 100
+                },
+                // Values to tween, these can also either be a function or number
+                values: {
+                    start: 0,
+                    stop: 100
+                },
+                property: 'scrollTop'
+            });
+            spyOn(scroll.items[0].$el, 'scrollTop');
+            scroll.update();
+            expect(scroll.items[0].$el.scrollTop).toHaveBeenCalled();
         });
 
         it('should assign an unique id to each item', function() {
@@ -385,6 +405,13 @@ describe("ScrollAnimate", function() {
 
             expect(Utilities.tweenPosition(200, 0, 100)).toBe(1);
             expect(Utilities.tweenPosition(0, 100, 200)).toBe(0);
+        });
+    });
+
+    describe('ScrollAnimate.getScrollTop', function() {
+        it('should return the scroll position', function(){
+            expect(scroll.getScrollTop()).toBe(0);
+            expect(typeof scroll.getScrollTop()).toBe('number');
         });
     });
 

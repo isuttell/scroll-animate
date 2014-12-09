@@ -329,6 +329,20 @@ Ease.CircInOut = function(percent, initial, change) {
   return change / 2 * (Math.sqrt(1 - (percent -= 2) * percent) + 1) + initial;
 };
 
+// DRY
+function elasticHelper(a, s, p, change) {
+  if (a < Math.abs(change)) {
+    a = change;
+    s = p / 4;
+  } else {
+    s = p / PI2 * Math.asin(change / a);
+  }
+  return {
+    a:a,
+    s:s
+  };
+}
+
 /**
  * ElasticIn Ease
  *
@@ -351,13 +365,8 @@ Ease.ElasticIn = function(percent, initial, change) {
   if (!p) {
     p = 1 * 0.3;
   }
-  if (a < Math.abs(change)) {
-    a = change;
-    s = p / 4;
-  } else {
-    s = p / PI2 * Math.asin(change / a);
-  }
-  return -(a * Math.pow(2, 10 * (percent -= 1)) * Math.sin((percent * 1 - s) * PI2 / p)) + initial;
+  var h = elasticHelper(a, s, p, change);
+  return -(h.a * Math.pow(2, 10 * (percent -= 1)) * Math.sin((percent * 1 - h.s) * PI2 / p)) + initial;
 };
 
 /**
@@ -382,13 +391,8 @@ Ease.ElasticOut = function(percent, initial, change) {
   if (!p) {
     p = 1 * 0.3;
   }
-  if (a < Math.abs(change)) {
-    a = change;
-    s = p / 4;
-  } else {
-    s = p / PI2 * Math.asin(change / a);
-  }
-  return a * Math.pow(2, -10 * percent) * Math.sin((percent * 1 - s) * PI2 / p) + change + initial;
+  var h = elasticHelper(a, s, p, change);
+  return h.a * Math.pow(2, -10 * percent) * Math.sin((percent * 1 - h.s) * PI2 / p) + change + initial;
 };
 
 /**
@@ -413,16 +417,11 @@ Ease.ElasticInOut = function(percent, initial, change) {
   if (!p) {
     p = 1 * (0.3 * 1.5);
   }
-  if (a < Math.abs(change)) {
-    a = change;
-    s = p / 4;
-  } else {
-    s = p / PI2 * Math.asin(change / a);
-  }
+  var h = elasticHelper(a, s, p, change);
   if (percent < 1) {
-    return -0.5 * (a * Math.pow(2, 10 * (percent -= 1)) * Math.sin((percent * 1 - s) * PI2 / p)) + initial;
+    return -0.5 * (h.a * Math.pow(2, 10 * (percent -= 1)) * Math.sin((percent * 1 - h.s) * PI2 / p)) + initial;
   }
-  return a * Math.pow(2, -10 * (percent -= 1)) * Math.sin((percent * 1 - s) * PI2 / p) * 0.5 + change + initial;
+  return h.a * Math.pow(2, -10 * (percent -= 1)) * Math.sin((percent * 1 - h.s) * PI2 / p) * 0.5 + change + initial;
 };
 
 /**
