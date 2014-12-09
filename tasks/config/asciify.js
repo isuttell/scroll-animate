@@ -12,11 +12,11 @@ module.exports = function(grunt) {
 
   grunt.config.set('asciify', {
     options: {
-      font: 'cyberlarge',
+      font: 'cybersmall',
       log: false
     },
     title: {
-      text: 'ScrollAnimate'
+      text: 'Scroll-Animate'
     }
   });
 

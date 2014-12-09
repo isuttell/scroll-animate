@@ -7,7 +7,6 @@
  * Bind polyfill
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind
  */
-/* istanbul ignore next */
 if (!Function.prototype.bind) {
   Function.prototype.bind = function(oThis) {
     if (typeof this !== 'function') {
@@ -38,16 +37,13 @@ if (!Function.prototype.bind) {
  *
  * @type {Array}
  */
-/* istanbul ignore next */
 var vendors = ['ms', 'moz', 'webkit', 'o'];
-/* istanbul ignore next */
 for (var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
   window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
   window.cancelAnimationFrame = window[vendors[x] + 'CancelAnimationFrame'] ||
     window[vendors[x] + 'CancelRequestAnimationFrame'];
 }
 
-/* istanbul ignore next */
 if (!window.requestAnimationFrame) {
   var lastFrameTime = 0;
   window.requestAnimationFrame = function(callback) {
@@ -62,7 +58,6 @@ if (!window.requestAnimationFrame) {
   };
 }
 
-/* istanbul ignore next */
 if (!window.cancelAnimationFrame) {
   window.cancelAnimationFrame = function(id) {
     clearTimeout(id);

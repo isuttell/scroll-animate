@@ -172,6 +172,54 @@ describe("ScrollAnimate", function() {
         });
     });
 
+    describe('ScrollAnimate.updateScrollPosition', function(){
+        it('should move the scrollPosition property bu options.speed', function() {
+            var $element = $('<div></div>');
+            var item = {
+                $el : $element,
+                // scrollTop positions to track. values can be either a number or a function
+                scroll: {
+                    start: 0,
+                    stop: 100
+                },
+                // Values to tween, these can also either be a function or number
+                values: {
+                    start: 0,
+                    stop: 1
+                },
+                property: 'opacity',
+            };
+            scroll.options.speed = 0.3;
+            scroll.scrollPosition = 0;
+            spyOn(scroll, 'getScrollTop').andReturn(100);
+            scroll.updateScrollPosition();
+            expect(scroll.scrollPosition).toBe(30);
+        });
+
+        it('should return scrollTop when the it\'s really close', function() {
+            var $element = $('<div></div>');
+            var item = {
+                $el : $element,
+                // scrollTop positions to track. values can be either a number or a function
+                scroll: {
+                    start: 0,
+                    stop: 100
+                },
+                // Values to tween, these can also either be a function or number
+                values: {
+                    start: 0,
+                    stop: 1
+                },
+                property: 'opacity',
+            };
+            scroll.options.speed = 0.3;
+            scroll.scrollPosition = 99.99999;
+            spyOn(scroll, 'getScrollTop').andReturn(100);
+            scroll.updateScrollPosition();
+            expect(scroll.scrollPosition).toBe(100);
+        });
+    });
+
     describe("ScrollAnimate.add", function() {
         it("should be a function", function() {
             expect(typeof scroll.add).toBe('function');
@@ -188,6 +236,26 @@ describe("ScrollAnimate", function() {
                     return new TimelineMax().to( $('<div></div>'), {opacity: 0}, 0);
                 }
             });
+            scroll.update(0);
+            expect(scroll.items[0]).toBeDefined();
+        });
+
+        it("should be take the 'filter' option", function() {
+            scroll.add({
+                $el: $('<div></div>'),
+                scroll: {
+                    start: 0,
+                    stop: 100
+                },
+                // Values to tween, these can also either be a function or number
+                values: {
+                    start: 0,
+                    stop: 100
+                },
+                property: 'filter',
+                filter: 'grayscale(%s)'
+            });
+            scroll.update(0);
             expect(scroll.items[0]).toBeDefined();
         });
 
@@ -306,14 +374,6 @@ describe("ScrollAnimate", function() {
 
         it('should be chainable', function() {
             expect(scroll.removeEventListeners()).toBe(scroll);
-        });
-    });
-
-    xdescribe("ScrollAnimate.options.smoothScroll", function(){
-        it('should be a an object with two options', function(){
-            expect(typeof ScrollAnimate.options().smoothScroll).toBe('object');
-            expect(typeof ScrollAnimate.options().smoothScroll.enabled).toBe('boolean');
-            expect(typeof ScrollAnimate.options().smoothScroll.speed).toBe('number');
         });
     });
 

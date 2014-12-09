@@ -10,7 +10,7 @@
   "scripts": {
     "test": "grunt test"
   },
-  "constributors": "Isaac Suttell <isaac@isaacsuttell.com>",
+  "contributors": "Isaac Suttell <isaac@isaacsuttell.com>",
   "readmeFilename": "README.md",
   "devDependencies": {
     "codeclimate-test-reporter": "0.0.4",
