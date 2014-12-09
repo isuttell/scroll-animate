@@ -343,6 +343,11 @@ function elasticHelper(a, s, p, change) {
   };
 }
 
+// DRY
+function elasticReturn(a, percent, s, p, initial, mod) {
+  return mod * (a * Math.pow(2, 10 * (percent -= 1)) * Math.sin((percent * 1 - s) * PI2 / p)) + initial;
+}
+
 /**
  * ElasticIn Ease
  *
@@ -366,7 +371,7 @@ Ease.ElasticIn = function(percent, initial, change) {
     p = 1 * 0.3;
   }
   var h = elasticHelper(a, s, p, change);
-  return -(h.a * Math.pow(2, 10 * (percent -= 1)) * Math.sin((percent * 1 - h.s) * PI2 / p)) + initial;
+  return elasticReturn(h.a, percent, h.s, p, initial, -1);
 };
 
 /**
@@ -419,7 +424,8 @@ Ease.ElasticInOut = function(percent, initial, change) {
   }
   var h = elasticHelper(a, s, p, change);
   if (percent < 1) {
-    return -0.5 * (h.a * Math.pow(2, 10 * (percent -= 1)) * Math.sin((percent * 1 - h.s) * PI2 / p)) + initial;
+    return elasticReturn(h.a, percent, h.s, p, initial, -0.5);
+    // return -0.5 * (h.a * Math.pow(2, 10 * (percent -= 1)) * Math.sin((percent * 1 - h.s) * PI2 / p)) + initial;
   }
   return h.a * Math.pow(2, -10 * (percent -= 1)) * Math.sin((percent * 1 - h.s) * PI2 / p) * 0.5 + change + initial;
 };
