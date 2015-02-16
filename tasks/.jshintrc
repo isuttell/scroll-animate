@@ -1,0 +1,15 @@
+{
+  "camelcase" : true,
+  "newcap"    : true,
+  "strict"    : false,
+  "trailing"  : true,
+  "browser"   : true,
+  "jquery"    : true,
+  "undef"     : true,
+  "unused"    : false,
+  "quotmark"  : false,
+  "globals"   : {
+    "define" : false,
+    "module" : true
+  }
+}
